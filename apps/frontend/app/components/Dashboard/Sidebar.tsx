@@ -13,16 +13,28 @@ import {
 } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PersonIcon from '@mui/icons-material/Person';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import WorkIcon from '@mui/icons-material/Work';
 import Link from 'next/link';
 import { useTheme } from '@mui/material/styles';
 
-const navItems = [
-  { label: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-  { label: 'Users', icon: <PersonIcon />, path: '/users' },
-];
+interface SidebarProps {
+  open: boolean;
+  role: 'admin' | 'user';
+}
 
-const Sidebar: React.FC<{ open: boolean }> = ({ open }) => {
+const Sidebar: React.FC<SidebarProps> = ({ open, role }) => {
   const theme = useTheme();
+
+  const navItems =
+    role === 'admin'
+      ? [
+          { label: 'Users', icon: <PersonIcon />, path: '/users' },
+        ]
+      : [
+          { label: 'Projects', icon: <WorkIcon />, path: '/projects' },
+          { label: 'Tasks', icon: <AssignmentIcon />, path: '/tasks' },
+        ];
 
   return (
     <Box
@@ -37,7 +49,6 @@ const Sidebar: React.FC<{ open: boolean }> = ({ open }) => {
         display: 'flex',
         flexDirection: 'column',
         borderRight: `1px solid #b6a9c2`,
-
       }}
     >
       <Toolbar />
@@ -46,14 +57,24 @@ const Sidebar: React.FC<{ open: boolean }> = ({ open }) => {
         {navItems.map((item) => (
           <ListItem key={item.label} disablePadding>
             <ListItemButton component={Link} href={item.path}>
-              <ListItemIcon sx={{ color: theme.palette.mode === 'light' ? theme.palette.primary.contrastText : theme.palette.secondary.contrastText }}>
+              <ListItemIcon
+                sx={{
+                  color:
+                    theme.palette.mode === 'light'
+                      ? theme.palette.primary.contrastText
+                      : theme.palette.secondary.contrastText,
+                }}
+              >
                 {item.icon}
               </ListItemIcon>
               {open && (
                 <ListItemText
                   primary={item.label}
                   sx={{
-                    color: theme.palette.mode === 'light' ? theme.palette.primary.contrastText : theme.palette.secondary.contrastText,
+                    color:
+                      theme.palette.mode === 'light'
+                        ? theme.palette.primary.contrastText
+                        : theme.palette.secondary.contrastText,
                   }}
                 />
               )}

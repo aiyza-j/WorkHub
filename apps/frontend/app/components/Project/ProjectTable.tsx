@@ -21,6 +21,7 @@ import {
   InputAdornment,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import { useRouter } from 'next/navigation';
 
 interface Project {
   _id: string;
@@ -60,6 +61,7 @@ export default function ProjectTable() {
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [uniqueOwners, setUniqueOwners] = useState<string[]>([]);
+  const router = useRouter();
 
   // Fetch projects with server-side filtering, pagination
   const fetchProjects = async () => {
@@ -249,7 +251,17 @@ export default function ProjectTable() {
                 </TableRow>
               ) : (
                 projects.map((project) => (
-                  <TableRow key={project._id.toString()}>
+                 <TableRow
+                      key={project._id.toString()}
+                      hover
+                      onClick={() => {
+                        if (!editingProjectId) {
+                          router.push(`/task?projectId=${project._id}`);
+                        }
+                      }}
+                      sx={{ cursor: 'pointer' }}
+                  >
+
                     <TableCell>
                       {editingProjectId === project._id ? (
                         <TextField
@@ -295,7 +307,7 @@ export default function ProjectTable() {
                           <Button
                             variant="outlined"
                             color="primary"
-                            onClick={() => handleEdit(project)}
+                            onClick={(e) => {e.stopPropagation(); handleEdit(project)}}
                             sx={{ mr: 1 }}
                           >
                             Edit

@@ -16,9 +16,19 @@ def new_task(current_user):
 @task_bp.route("/project/<project_id>", methods=["GET"])
 @token_required
 def get_tasks(current_user, project_id):
+    search = request.args.get("search", "").strip()
+    status = request.args.get("status", "").strip().lower()
+    page = int(request.args.get("page", 1))
+    per_page = int(request.args.get("per_page", 10))
 
-    tasks = get_tasks_by_project(project_id)
-    return jsonify(tasks)
+    tasks, total = get_tasks_by_project(project_id, search, status, page, per_page)
+
+    return jsonify({
+        "tasks": tasks,
+        "total": total,
+        "page": page,
+        "per_page": per_page
+    })
 
 @task_bp.route("/update-status", methods=["PUT"])
 @token_required

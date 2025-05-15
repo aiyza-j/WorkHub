@@ -16,13 +16,20 @@ import {
   TextField,
   Button,
   Pagination,
+  InputAdornment,
 } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 
 interface User {
   _id: string;
   email: string;
   full_name: string;
   role: string;
+}
+
+interface ServerResponse {
+  users: User[];
+  totalCount: number;
 }
 
 const style = {
@@ -36,35 +43,43 @@ const style = {
   borderRadius: 2,
 };
 
+const ITEMS_PER_PAGE = 5;
+
 export default function AdminDashboard() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
   const fetchUsers = async () => {
     setLoading(true);
+    setError(null);
     const token = localStorage.getItem('token');
-    const limit = 5;
+
+    const params = new URLSearchParams();
+    params.append('page', page.toString());
+    params.append('limit', ITEMS_PER_PAGE.toString());
+    if (searchTerm) params.append('search', searchTerm);
 
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/users/?page=${page}&limit=${limit}&search=${search}`,
-        {
-          headers: { Authorization: token || '' },
-        }
-      );
+      const res = await fetch(`http://localhost:5000/api/users/?${params.toString()}`, {
+        headers: { Authorization: token || '' },
+      });
       if (!res.ok) throw new Error('Failed to fetch users');
-      const data = await res.json();
+      const data: ServerResponse = await res.json();
+
       setUsers(data.users);
-      setTotalPages(Math.ceil(data.total / limit));
+      setTotalCount(data.totalCount);
     } catch (err: any) {
       setError(err.message);
+      setUsers([]);
+      setTotalCount(0);
     } finally {
       setLoading(false);
     }
@@ -72,7 +87,11 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetchUsers();
-  }, [page, search]);
+  }, [searchTerm, page]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm]);
 
   const handleOpenEditModal = (user: User) => {
     setSelectedUser(user);
@@ -88,13 +107,15 @@ export default function AdminDashboard() {
     setSelectedUser(null);
     setOpenEditModal(false);
     setOpenDeleteModal(false);
+    setEditingUserId(null);
   };
 
   const handleSave = async () => {
     if (!selectedUser) return;
     const token = localStorage.getItem('token');
+
     try {
-      await fetch('http://localhost:5000/api/users/update', {
+      const res = await fetch('http://localhost:5000/api/users/update', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -102,6 +123,8 @@ export default function AdminDashboard() {
         },
         body: JSON.stringify(selectedUser),
       });
+
+      if (!res.ok) throw new Error('Failed to update user');
       fetchUsers();
       handleCloseModals();
     } catch (err) {
@@ -128,76 +151,154 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleEdit = (user: User) => {
+    setEditingUserId(user._id);
+    setSelectedUser({ ...user });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingUserId(null);
+    setSelectedUser(null);
+  };
+
   return (
     <Box sx={{ padding: 4, marginTop: 8 }}>
-      <Typography variant="h4" gutterBottom>Admin Dashboard</Typography>
+      <Typography variant="h4" gutterBottom>
+        Admin Dashboard
+      </Typography>
 
-      <TextField
-        label="Search"
-        value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          setPage(1);
-        }}
-        sx={{ mb: 5, width: "90%"}}
-      />
+      <Box sx={{
+        display: 'flex',
+        gap: 2,
+        mb: 3,
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        mt: 5
+      }}>
+        <TextField
+          sx={{ width: "80%" }}
+          label="Search"
+          variant="outlined"
+          size="small"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Box>
 
       {loading ? (
-        <CircularProgress sx={{ ml:2 }}/>
+        <CircularProgress />
       ) : error ? (
         <Typography color="error">{error}</Typography>
       ) : (
         <>
-          <TableContainer component={Paper} sx={{ width: '90%', mb: 2 }}>
+          <TableContainer component={Paper} sx={{ width: '100%', mb: 2 }}>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 'bold', border: '1px solid #3c096c' }}>Full Name</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', border: '1px solid #3c096c' }}>Email</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', border: '1px solid #3c096c' }}>Role</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold', border: '1px solid #3c096c' }}>Actions</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Full Name</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Email</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Role</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {users.map((user) => (
-                  <TableRow key={user._id}>
-                    <TableCell>{user.full_name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.role}</TableCell>
-                    <TableCell>
-                      <Button
-                        variant="outlined"
-                        sx={{ mr: 1,  border: '1px solid #3c096c', color: '#3c096c'}}
-                        onClick={() => handleOpenEditModal(user)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        onClick={() => handleOpenDeleteModal(user)}
-                      >
-                        Delete
-                      </Button>
+                {users.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} align="center">
+                      No users found.
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  users.map((user) => (
+                    <TableRow key={user._id}>
+                      <TableCell>
+                        {editingUserId === user._id ? (
+                          <TextField
+                            value={selectedUser?.full_name || ''}
+                            onChange={(e) =>
+                              setSelectedUser((prev) => ({ ...prev!, full_name: e.target.value }))
+                            }
+                            size="small"
+                          />
+                        ) : (
+                          user.full_name
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editingUserId === user._id ? (
+                          <TextField
+                            value={selectedUser?.email || ''}
+                            onChange={(e) =>
+                              setSelectedUser((prev) => ({ ...prev!, email: e.target.value }))
+                            }
+                            size="small"
+                          />
+                        ) : (
+                          user.email
+                        )}
+                      </TableCell>
+                      <TableCell>{user.role}</TableCell>
+                      <TableCell>
+                        {editingUserId === user._id ? (
+                          <>
+                            <Button variant="contained" onClick={handleSave} sx={{ mr: 1 }}>
+                              Save
+                            </Button>
+                            <Button variant="outlined" onClick={handleCancelEdit}>
+                              Cancel
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            <Button
+                              variant="outlined"
+                              color="primary"
+                              onClick={() => handleEdit(user)}
+                              sx={{ mr: 1 }}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              variant="outlined"
+                              color="error"
+                              onClick={() => handleOpenDeleteModal(user)}
+                            >
+                              Delete
+                            </Button>
+                          </>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </TableContainer>
 
           <Pagination
-            count={totalPages}
+            count={Math.ceil(totalCount / ITEMS_PER_PAGE)}
             page={page}
             onChange={(_, value) => setPage(value)}
-            color="primary"
+            sx={{ mt: 2 }}
           />
         </>
       )}
 
+      {/* Edit Modal */}
       <Modal open={openEditModal} onClose={handleCloseModals}>
         <Box sx={style}>
-          <Typography variant="h6" mb={2}>Edit User</Typography>
+          <Typography variant="h6" mb={2}>
+            Edit User
+          </Typography>
           <TextField
             fullWidth
             label="Full Name"
@@ -216,16 +317,20 @@ export default function AdminDashboard() {
             }
             sx={{ mb: 2 }}
           />
-          <Button variant="contained" onClick={handleSave}>Save</Button>
+          <Button variant="contained" onClick={handleSave}>
+            Save
+          </Button>
         </Box>
       </Modal>
 
+      {/* Delete Modal */}
       <Modal open={openDeleteModal} onClose={handleCloseModals}>
         <Box sx={style}>
-          <Typography variant="h6" mb={2}>Confirm Delete</Typography>
+          <Typography variant="h6" mb={2}>
+            Confirm Delete
+          </Typography>
           <Typography mb={2}>
-            Are you sure you want to delete user{' '}
-            <strong>{selectedUser?.full_name}</strong>?
+            Are you sure you want to delete user <strong>{selectedUser?.full_name}</strong>?
           </Typography>
           <Button variant="contained" color="error" onClick={handleDelete}>
             Confirm Delete
