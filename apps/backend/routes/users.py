@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, current_app, request
+from flask import Blueprint, jsonify, request
 from utils.decorators import token_required, require_role
 from models.user import get_all_users, delete_user_by_email, update_user_by_email
 from extensions import mongo
@@ -9,8 +9,35 @@ user_bp = Blueprint("users", __name__)
 @token_required
 @require_role("admin")
 def get_users(current_user):
-    users = get_all_users()
-    return jsonify(users)
+    page = int(request.args.get("page", 1))
+    limit = int(request.args.get("limit", 10))
+    search = request.args.get("search", "")
+    role_filter = request.args.get("role")
+
+    query = {}
+    if search:
+        query["$or"] = [
+            {"full_name": {"$regex": search, "$options": "i"}},
+            {"email": {"$regex": search, "$options": "i"}}
+        ]
+    if role_filter:
+        query["role"] = role_filter
+
+    skip = (page - 1) * limit
+    users_cursor = mongo.db.users.find(query).skip(skip).limit(limit)
+    users = list(users_cursor)
+    total = mongo.db.users.count_documents(query)
+
+    for user in users:
+        user["_id"] = str(user["_id"])
+
+    return jsonify({
+        "users": users,
+        "total": total,
+        "page": page,
+        "limit": limit
+    })
+
 
 
 @user_bp.route("/delete", methods=["DELETE"])

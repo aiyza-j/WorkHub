@@ -1,6 +1,7 @@
-// hooks/useSession.tsx
+
 import { useState, useEffect } from 'react';
-import {jwtDecode} from 'jwt-decode'; // Ensure esModuleInterop is true in tsconfig
+import {jwtDecode} from 'jwt-decode';
+import { useRouter } from 'next/navigation';
 
 interface SessionData {
   email: string;
@@ -18,6 +19,7 @@ interface UseSessionReturn {
 export const useSession = (): UseSessionReturn => {
   const [session, setSession] = useState<SessionData | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter()
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -28,9 +30,15 @@ export const useSession = (): UseSessionReturn => {
           setSession(decoded);
         } else {
           localStorage.removeItem('token');
+          alert('Invalid session. Please log in again.');
+          router.push('/login');
+
         }
       } catch {
         localStorage.removeItem('token');
+        alert('Invalid session. Please log in again.');
+        router.push('/login');
+
       }
     }
     setLoading(false);
