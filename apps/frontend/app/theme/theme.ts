@@ -26,6 +26,16 @@ const getTheme = (mode: 'light' | 'dark') => {
         defaultProps: {
           variant: 'contained',
         },
+        styleOverrides: {
+          outlined: {
+            color: mode === 'dark' ? '#ffffff' : '#3c096c',
+            borderColor: mode === 'dark' ? '#ffffff' : '#3c096c',
+            '&:hover': {
+              borderColor: mode === 'dark' ? '#ffffff' : '#3c096c',
+              backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(60, 9, 108, 0.04)',
+            },
+          },
+        },
       },
     },
   });

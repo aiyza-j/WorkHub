@@ -68,51 +68,44 @@ export default function TaskTable() {
   const searchParams = useSearchParams();
   const projectId = searchParams.get('projectId');
 
-  // Fetch tasks with server-side filtering, pagination
   const fetchTasks = async () => {
-    setLoading(true);
-    setError(null);
-    const token = localStorage.getItem('token');
+  setLoading(true);
+  setError(null);
+  const token = localStorage.getItem('token');
 
-    if (!projectId) {
-      setError('Project ID is required');
-      setLoading(false);
-      return;
-    }
-
+  try {
     const params = new URLSearchParams();
     params.append('page', page.toString());
     params.append('per_page', ITEMS_PER_PAGE.toString());
     if (searchTerm) params.append('search', searchTerm);
     if (statusFilter) params.append('status', statusFilter);
 
-    try {
-      const res = await fetch(
-        `http://localhost:5000/api/tasks/project/${projectId}?${params.toString()}`,
-        {
-          headers: { Authorization: token || '' },
-        }
-      );
-      if (!res.ok) throw new Error('Failed to fetch tasks');
-      const data: ServerResponse = await res.json();
+    const url = projectId
+      ? `http://localhost:5000/api/tasks/project/${projectId}?${params.toString()}`
+      : `http://localhost:5000/api/tasks/user-tasks?${params.toString()}`;
 
-      setTasks(data.tasks);
-      setTotalCount(data.total);
-    } catch (err: any) {
-      setError(err.message);
-      setTasks([]);
-      setTotalCount(0);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const res = await fetch(url, {
+      headers: { Authorization: token || '' },
+    });
 
-  // Refetch tasks on filters or page change
+    if (!res.ok) throw new Error('Failed to fetch tasks');
+    const data: ServerResponse = await res.json();
+
+    setTasks(data.tasks);
+    setTotalCount(data.total);
+  } catch (err: any) {
+    setError(err.message);
+    setTasks([]);
+    setTotalCount(0);
+  } finally {
+    setLoading(false);
+  }
+};
+
   useEffect(() => {
     fetchTasks();
   }, [searchTerm, statusFilter, page, projectId]);
 
-  // Reset to page 1 if filters change
   useEffect(() => {
     setPage(1);
   }, [searchTerm, statusFilter]);
@@ -272,9 +265,11 @@ export default function TaskTable() {
           </Select>
         </Box>
 
+       {projectId && (
         <Button variant="contained" onClick={handleOpenCreateModal}>
           + Create Task
         </Button>
+        )}
       </Box>
 
       {loading ? (
@@ -291,7 +286,7 @@ export default function TaskTable() {
                   <TableCell sx={{ fontWeight: 'bold' }}>Description</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Assignee</TableCell>
                   <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
+                  {projectId && <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -384,7 +379,7 @@ export default function TaskTable() {
                               Cancel
                             </Button>
                           </>
-                        ) : (
+                        ) : projectId && (
                           <>
                             <Button
                               variant="outlined"

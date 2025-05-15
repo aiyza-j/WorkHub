@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app
 from utils.decorators import token_required
-from models.task import create_task, get_tasks_by_project, update_task_status, delete_task
+from models.task import create_task, get_tasks_by_project, update_task_status, delete_task, get_user_tasks
 from extensions import mongo
 
 task_bp = Blueprint("tasks", __name__)
@@ -45,3 +45,26 @@ def delete(current_user):
 
     result = delete_task(task_id)
     return jsonify({"deleted": result.deleted_count})
+
+@task_bp.route("/user-tasks", methods=["GET"])
+@token_required
+def get_user_tasks_route(current_user):
+    search = request.args.get("search", "").strip()
+    status = request.args.get("status", "").strip().lower()
+    page = int(request.args.get("page", 1))
+    per_page = int(request.args.get("per_page", 10))
+
+    tasks, total = get_user_tasks(
+        current_user["email"],
+        search,
+        status,
+        page,
+        per_page
+    )
+
+    return jsonify({
+        "tasks": tasks,
+        "total": total,
+        "page": page,
+        "per_page": per_page
+    })

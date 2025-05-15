@@ -42,3 +42,30 @@ def update_task_status(task_id, status):
 def delete_task(task_id):
     from bson import ObjectId
     return mongo.db.tasks.delete_one({"_id": ObjectId(task_id)})
+
+def get_user_tasks(user_email, search="", status="", page=1, per_page=10):
+    query = {"assignee": user_email}
+
+    if status:
+        query["status"] = status
+
+    if search:
+        regex = re.compile(re.escape(search), re.IGNORECASE)
+        query["$or"] = [{"title": regex}, {"description": regex}]
+
+    skip_count = (page - 1) * per_page
+
+    cursor = mongo.db.tasks.find(query).skip(skip_count).limit(per_page)
+    tasks = list(cursor)
+
+    #mapping to simple numbers
+    project_ids = list({task["project_id"] for task in tasks})
+    project_id_map = {pid: str(i+1) for i, pid in enumerate(project_ids)}
+
+    for task in tasks:
+        task["_id"] = str(task["_id"])
+        task["project_id"] = project_id_map.get(task["project_id"], "0")
+
+    total = mongo.db.tasks.count_documents(query)
+
+    return tasks, total

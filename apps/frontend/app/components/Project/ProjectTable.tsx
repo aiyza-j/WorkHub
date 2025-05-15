@@ -306,7 +306,7 @@ export default function ProjectTable() {
                         <>
                           <Button
                             variant="outlined"
-                            color="primary"
+                            color="secondary"
                             onClick={(e) => {e.stopPropagation(); handleEdit(project)}}
                             sx={{ mr: 1 }}
                           >

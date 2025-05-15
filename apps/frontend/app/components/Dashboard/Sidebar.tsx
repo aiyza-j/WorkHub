@@ -29,11 +29,11 @@ const Sidebar: React.FC<SidebarProps> = ({ open, role }) => {
   const navItems =
     role === 'admin'
       ? [
-          { label: 'Users', icon: <PersonIcon />, path: '/users' },
+          { label: 'Users', icon: <PersonIcon />, path: '/dashbaord/admin' },
         ]
       : [
-          { label: 'Projects', icon: <WorkIcon />, path: '/projects' },
-          { label: 'Tasks', icon: <AssignmentIcon />, path: '/tasks' },
+          { label: 'Projects', icon: <WorkIcon />, path: '/project' },
+          { label: 'Tasks', icon: <AssignmentIcon />, path: '/task' },
         ];
 
   return (
