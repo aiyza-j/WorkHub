@@ -15,7 +15,7 @@ export default function DashboardCard({
   onClick,
 }: DashboardCardProps) {
   return (
-    <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%', width: '80%' }}>
+    <Card sx={{ display: 'flex', flexDirection: 'row', height: '100%', width: '100%' }}>
       <CardActionArea onClick={onClick}>
         <CardContent sx={{ flex: 1 }}>
           <Typography variant="h6" component="div" gutterBottom>
@@ -27,7 +27,7 @@ export default function DashboardCard({
         </CardContent>
       </CardActionArea>
 
-      <Box sx={{ padding: 2, pt: 0 }}>
+      <Box sx={{ padding: 2, pt: 0, mt:2 }}>
         <Button variant="contained" color="primary" fullWidth onClick={onClick}>
           {buttonText}
         </Button>

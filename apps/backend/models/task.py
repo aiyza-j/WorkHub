@@ -1,6 +1,7 @@
 import datetime
+from extensions import mongo
 
-def create_task(mongo, title, description, project_id, assignee_email):
+def create_task(title, description, project_id, assignee_email):
     task = {
         "title": title,
         "description": description,
@@ -14,10 +15,10 @@ def create_task(mongo, title, description, project_id, assignee_email):
 def get_tasks_by_project(mongo, project_id):
     return list(mongo.db.tasks.find({"project_id": project_id}))
 
-def update_task_status(mongo, task_id, status):
+def update_task_status(task_id, status):
     from bson import ObjectId
     return mongo.db.tasks.update_one({"_id": ObjectId(task_id)}, {"$set": {"status": status}})
 
-def delete_task(mongo, task_id):
+def delete_task(task_id):
     from bson import ObjectId
     return mongo.db.tasks.delete_one({"_id": ObjectId(task_id)})

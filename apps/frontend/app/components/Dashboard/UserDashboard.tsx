@@ -1,9 +1,11 @@
 import React from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import DashboardCard from './DashboardCard';
+import {useRouter} from 'next/navigation'
 
 
 export default function UserDashboard() {
+  const router = useRouter()
   return (
     <Box sx={{ padding: 2, marginTop: 10 }}>
       <Typography variant="h3" gutterBottom>
@@ -11,13 +13,13 @@ export default function UserDashboard() {
       </Typography>
 
 
-      <Grid container spacing={2} sx={{ marginTop: 2 }}>
+      <Grid container spacing={2} sx={{ marginTop: 2, width: "100%"}}>
         <Grid>
           <DashboardCard
             title="My Projects"
             description="View all your projects."
             buttonText="Go to Projects"
-            onClick={() => console.log('Go to My Projects')}
+            onClick={() => router.push('/project')}
           />
         </Grid>
 
@@ -27,7 +29,7 @@ export default function UserDashboard() {
             title="My Tasks"
             description="View and manage your tasks."
             buttonText="Go to Tasks"
-            onClick={() => console.log('Go to My Tasks')}
+            onClick={() => router.push('/task')}
           />
         </Grid>
 
