@@ -13,6 +13,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import { useTheme } from '@mui/material/styles';
+import {logout} from '../../utils/auth'
 
 interface HeaderProps {
   toggleTheme: () => void;
@@ -48,6 +49,7 @@ const Header = ({ toggleTheme, mode, toggleSidebar, sidebarOpen }: HeaderProps) 
             color="inherit"
             variant="contained"
             size="small"
+            onClick={logout}
             sx={{
               backgroundColor: theme.palette.mode === 'light' ? theme.palette.primary.main : theme.palette.secondary.main,
               color: theme.palette.mode === 'light' ? theme.palette.primary.contrastText : theme.palette.secondary.contrastText,

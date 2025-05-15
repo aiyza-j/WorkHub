@@ -2,14 +2,15 @@ import React from 'react';
 import { Box, Grid, Typography } from '@mui/material';
 import DashboardCard from './DashboardCard';
 
+
 export default function UserDashboard() {
   return (
-    <Box sx={{ padding: 2 }}>
-      <Typography variant="h4" gutterBottom>
+    <Box sx={{ padding: 2, marginTop: 10 }}>
+      <Typography variant="h3" gutterBottom>
         User Dashboard
       </Typography>
 
-      {/* User Projects */}
+
       <Grid container spacing={2} sx={{ marginTop: 2 }}>
         <Grid>
           <DashboardCard
@@ -20,7 +21,7 @@ export default function UserDashboard() {
           />
         </Grid>
 
-        {/* My Tasks */}
+
         <Grid >
           <DashboardCard
             title="My Tasks"
@@ -30,15 +31,6 @@ export default function UserDashboard() {
           />
         </Grid>
 
-        {/* Notifications */}
-        <Grid >
-          <DashboardCard
-            title="Notifications"
-            description="Check important notifications."
-            buttonText="View Notifications"
-            onClick={() => console.log('Go to Notifications')}
-          />
-        </Grid>
       </Grid>
     </Box>
   );

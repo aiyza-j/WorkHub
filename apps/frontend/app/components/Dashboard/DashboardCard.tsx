@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, Typography, Button, CardActionArea } from '@mui/material';
+import { Card, CardContent, Typography, Button, CardActionArea, Box } from '@mui/material';
 
 interface DashboardCardProps {
   title: string;
@@ -21,14 +21,17 @@ export default function DashboardCard({
           <Typography variant="h6" component="div" gutterBottom>
             {title}
           </Typography>
-          <Typography variant="body2" color="text.secondary" paragraph>
+          <Typography variant="body2" color="text.secondary">
             {description}
           </Typography>
-          <Button variant="contained" color="primary" sx={{ marginTop: 'auto' }}>
-            {buttonText}
-          </Button>
         </CardContent>
       </CardActionArea>
+
+      <Box sx={{ padding: 2, pt: 0 }}>
+        <Button variant="contained" color="primary" fullWidth onClick={onClick}>
+          {buttonText}
+        </Button>
+      </Box>
     </Card>
   );
 }

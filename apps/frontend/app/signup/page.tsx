@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { useErrorSnackbar } from '../hooks/useErrorSnackbar';
 
 const SignUpPage = () => {
   const router = useRouter();
@@ -23,8 +24,9 @@ const SignUpPage = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State for toggling confirm password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { showError, SnackbarComponent } = useErrorSnackbar();
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -61,7 +63,7 @@ const SignUpPage = () => {
     return password === confirmPassword;
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!validateEmail(email)) {
@@ -74,8 +76,38 @@ const SignUpPage = () => {
       return;
     }
 
-    // TODO: submit sign up
-    console.log('Signing up with:', { fullName, email, password });
+    try {
+            const res = await fetch('http://localhost:5000/api/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                full_name: fullName,
+                email,
+                password,
+                role: "user"
+            }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+            if (data.message?.includes('Email already')) {
+                setEmailError('Email already registered.');
+            } else {
+                showError(data.message || 'Signup Failed');
+            }
+            } else {
+            alert('Sign-up successful!');
+            router.push('/login');
+            }
+        } catch (error: any) {
+            console.error('Sign-up error:', error);
+            showError(error.message || 'Something went wrong.');
+        }
+
+
   };
 
   return (

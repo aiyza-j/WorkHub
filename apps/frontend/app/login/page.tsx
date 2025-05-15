@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import TextField from '@mui/material/TextField';
+import { useErrorSnackbar } from '../hooks/useErrorSnackbar';
 
 const LoginPage = () => {
   const router = useRouter();
@@ -22,6 +23,7 @@ const LoginPage = () => {
   const [emailError, setEmailError] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const { showError, SnackbarComponent } = useErrorSnackbar();
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -36,15 +38,43 @@ const LoginPage = () => {
     return /\S+@\S+\.\S+/.test(value);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validateEmail(email)) {
       setEmailError('Please enter a valid email address.');
       return;
     }
 
-    // TODO: submit login
-    console.log('Logging in with:', { email, password });
+     try {
+            const res = await fetch('http://localhost:5000/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email,
+                password
+            }),
+            });
+
+            const data = await res.json();
+
+            localStorage.setItem('token', data.token);
+
+            if (!res.ok) {
+            if (data.message?.includes('Invalid credentials')) {
+                setEmailError('Invalid credentials.');
+            } else {
+                showError(data.message || 'Invalid credentials');
+            }
+            } else {
+            alert('Login Successfull successful!');
+            router.push('/dashboard');
+            }
+        } catch (error: any) {
+            console.error('Sign-up error:', error);
+            showError(error.message || 'Something went wrong.');
+        }
   };
 
   return (
