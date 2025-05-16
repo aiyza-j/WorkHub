@@ -17,18 +17,18 @@ import DarkModeIcon from '@mui/icons-material/DarkMode';
 import { useTheme } from '@mui/material/styles';
 import { logout } from '../../utils/auth';
 import { motion } from 'framer-motion';
+import { useThemeContext } from '../../contexts/ThemeContext';
 
 interface HeaderProps {
-  toggleTheme: () => void;
-  mode: 'light' | 'dark';
   toggleSidebar: () => void;
   sidebarOpen: boolean;
 }
 
-const Header = ({ toggleTheme, mode, toggleSidebar, sidebarOpen }: HeaderProps) => {
+const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
   const theme = useTheme();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm'));
+  const { toggleTheme, mode } = useThemeContext();
 
   return (
     <AppBar
@@ -106,7 +106,7 @@ const Header = ({ toggleTheme, mode, toggleSidebar, sidebarOpen }: HeaderProps) 
               onClick={logout}
               sx={{
                 backgroundColor: mode === 'light' ? theme.palette.primary.main : theme.palette.secondary.main,
-                color: '#fff',
+                color:  mode === 'light' ? "#fff" : "#000",
                 borderRadius: 6,
                 textTransform: 'none',
                 fontWeight: 500,

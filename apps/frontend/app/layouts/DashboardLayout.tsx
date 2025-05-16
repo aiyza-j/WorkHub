@@ -5,16 +5,20 @@ import { Box, useTheme, useMediaQuery, CssBaseline } from '@mui/material';
 import Header from '../components/Dashboard/Header';
 import Sidebar from '../components/Dashboard/Sidebar';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSession } from '@/app/hooks/useSession';
+import { useThemeContext } from '../contexts/ThemeContext';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
-  const [mode, setMode] = useState<'light' | 'dark'>('light');
+  const { mode, toggleTheme } = useThemeContext();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { session, loading } = useSession();
+
 
   // Set sidebar collapsed state on mobile devices
   useEffect(() => {
@@ -25,9 +29,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     }
   }, [isMobile]);
 
-  const toggleTheme = () => {
-    setMode(mode === 'light' ? 'dark' : 'light');
-  };
+
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -53,12 +55,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     >
       <CssBaseline />
       <Header
-        toggleTheme={toggleTheme}
-        mode={mode}
+
         toggleSidebar={toggleSidebar}
         sidebarOpen={sidebarOpen}
       />
-      <Sidebar open={sidebarOpen} role={role} />
+      <Sidebar open={sidebarOpen} role={session?.role as 'admin' | 'user'} />
 
       <Box
         component={motion.div}

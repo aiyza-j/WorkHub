@@ -22,6 +22,7 @@ import Link from 'next/link';
 import { useTheme } from '@mui/material/styles';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
+import { useSession } from '@/app/hooks/useSession';
 
 interface SidebarProps {
   open: boolean;
