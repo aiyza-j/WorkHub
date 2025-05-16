@@ -1,48 +1,97 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Box, CircularProgress } from '@mui/material';
-import Sidebar from '../components/Dashboard/Sidebar';
+import React, { useState, useEffect } from 'react';
+import { Box, useTheme, useMediaQuery, CssBaseline } from '@mui/material';
 import Header from '../components/Dashboard/Header';
-import ThemeRegistry from '../theme/ThemeRegistry';
-import { useSession } from '../hooks/useSession'; 
+import Sidebar from '../components/Dashboard/Sidebar';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
-  const { session, loading } = useSession();
+interface DashboardLayoutProps {
+  children: React.ReactNode;
+}
+
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [mode, setMode] = useState<'light' | 'dark'>('light');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  // Set sidebar collapsed state on mobile devices
+  useEffect(() => {
+    if (isMobile) {
+      setSidebarOpen(false);
+    } else {
+      setSidebarOpen(true);
+    }
+  }, [isMobile]);
 
   const toggleTheme = () => {
-    setMode((prev) => (prev === 'light' ? 'dark' : 'light'));
+    setMode(mode === 'light' ? 'dark' : 'light');
   };
 
   const toggleSidebar = () => {
-    setSidebarOpen((prev) => !prev);
+    setSidebarOpen(!sidebarOpen);
   };
 
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center' }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
+  // Get user role from localStorage or default to 'user'
+  const [role, setRole] = useState<'admin' | 'user'>('user');
+
+  useEffect(() => {
+    const userRole = localStorage.getItem('userRole') as 'admin' | 'user';
+    if (userRole) {
+      setRole(userRole);
+    }
+  }, []);
 
   return (
-    <ThemeRegistry mode={mode}>
-      <Box sx={{ display: 'flex' }}>
-        <Sidebar open={sidebarOpen} role={session?.role === 'admin' ? 'admin' : 'user'} />
-        <Box component="main" sx={{ flexGrow: 1, ml: sidebarOpen ? '240px' : '60px', transition: 'margin-left 0.3s' }}>
-          <Header
-            toggleTheme={toggleTheme}
-            mode={mode}
-            toggleSidebar={toggleSidebar}
-            sidebarOpen={sidebarOpen}
-          />
-          <Box sx={{ p: 3 }}>{children}</Box>
-        </Box>
+    <Box
+      sx={{
+        display: 'flex',
+        minHeight: '100vh',
+        backgroundColor: theme.palette.mode === 'dark' ? 'rgba(10,10,10,0.95)' : 'rgba(250,250,252,0.95)',
+      }}
+    >
+      <CssBaseline />
+      <Header
+        toggleTheme={toggleTheme}
+        mode={mode}
+        toggleSidebar={toggleSidebar}
+        sidebarOpen={sidebarOpen}
+      />
+      <Sidebar open={sidebarOpen} role={role} />
+
+      <Box
+        component={motion.div}
+        layout
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        sx={{
+          flexGrow: 1,
+          padding: { xs: 1, sm: 2, md: 3 },
+          marginTop: '64px', // Height of the header
+          marginLeft: sidebarOpen
+            ? { xs: '65px', sm: '240px' }
+            : { xs: '65px', sm: '70px' },
+          transition: 'margin-left 0.3s ease',
+          width: '100%',
+          overflow: 'auto',
+        }}
+      >
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={window.location.pathname}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            style={{ width: '100%' }}
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
       </Box>
-    </ThemeRegistry>
+    </Box>
   );
 };
 
