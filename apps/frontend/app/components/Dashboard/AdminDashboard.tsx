@@ -387,15 +387,7 @@ const AdminDashboard = () => {
                               <Chip
                                 label={user.role}
                                 size="small"
-                                sx={{
-                                  backgroundColor: user.role === 'admin'
-                                    ? alpha(theme.palette.secondary.main, 0.2)
-                                    : alpha(theme.palette.primary.main, 0.2),
-                                  color: user.role === 'admin'
-                                    ? theme.palette.secondary.dark
-                                    : theme.palette.primary.dark,
-                                  fontWeight: 500
-                                }}
+
                               />
                             </TableCell>
                             <TableCell>
@@ -497,9 +489,12 @@ const AdminDashboard = () => {
                   onChange={(_, value) => setPage(value)}
                   color="primary"
                   size="large"
-                  showFirstButton
-                  showLastButton
+                  showFirstButton={false}
+                  showLastButton={page < Math.ceil(totalCount / ITEMS_PER_PAGE)}
+                  siblingCount={1}
+                  boundaryCount={1}
                 />
+
               </Box>
             </motion.div>
           </>

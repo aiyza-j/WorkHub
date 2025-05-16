@@ -24,7 +24,7 @@ export const ThemeProviderContext = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// ✅ Export custom hook
+
 export const useThemeContext = (): ThemeContextType => {
   const context = useContext(ThemeContext);
   if (!context) {

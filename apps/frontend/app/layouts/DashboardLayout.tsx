@@ -2,11 +2,18 @@
 
 import React, { useState, useEffect } from 'react';
 import { Box, useTheme, useMediaQuery, CssBaseline } from '@mui/material';
-import Header from '../components/Dashboard/Header';
-import Sidebar from '../components/Dashboard/Sidebar';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSession } from '@/app/hooks/useSession';
 import { useThemeContext } from '../contexts/ThemeContext';
+import dynamic from 'next/dynamic';
+const Header = dynamic(() => import('../components/Dashboard/Header'), {
+  ssr: false,
+  loading: () => <div style={{ height: '64px' }}></div>,
+});
+const Sidebar = dynamic(() => import('../components/Dashboard/Sidebar'), {
+  ssr: false,
+  loading: () => <div style={{ height: '64px' }}></div>,
+});
 
 interface DashboardLayoutProps {
   children: React.ReactNode;

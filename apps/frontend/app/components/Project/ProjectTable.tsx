@@ -53,8 +53,8 @@ interface ServerResponse {
 
 const modalStyle = {
   position: 'absolute' as const,
-  top: '50%',
-  left: '50%',
+  top: '30%',
+  left: '40%',
   transform: 'translate(-50%, -50%)',
   width: { xs: '90%', sm: 400 },
   bgcolor: 'background.paper',
@@ -178,7 +178,7 @@ export default function ProjectTable() {
         }),
       });
 
-  
+
       fetchProjects();
       handleCloseModals();
     } catch (err) {

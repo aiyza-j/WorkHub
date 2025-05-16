@@ -10,10 +10,10 @@ const UserPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading or fetch
+
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 2000); // Adjust the time or replace with actual data fetch
+    }, 2000); 
 
     return () => clearTimeout(timer);
   }, []);
