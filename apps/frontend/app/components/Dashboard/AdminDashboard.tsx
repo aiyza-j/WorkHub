@@ -139,7 +139,6 @@ const AdminDashboard = () => {
         body: JSON.stringify(selectedUser),
       });
 
-      if (!res.ok) throw new Error('Failed to update user');
       fetchUsers();
       handleCloseModals();
     } catch (err) {
@@ -337,7 +336,7 @@ const AdminDashboard = () => {
                             animate="visible"
                             custom={index}
                             exit={{ opacity: 0, x: -20 }}
-                           
+
                             sx={{
                               '&:hover': {
                                 backgroundColor: alpha(theme.palette.primary.main, 0.04)

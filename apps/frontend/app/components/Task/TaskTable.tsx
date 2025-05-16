@@ -199,7 +199,6 @@ export default function TaskTable() {
         }),
       });
 
-      if (!res.ok) throw new Error('Failed to update task');
       fetchTasks();
       handleCloseModals();
     } catch (err) {

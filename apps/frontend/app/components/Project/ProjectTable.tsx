@@ -178,7 +178,7 @@ export default function ProjectTable() {
         }),
       });
 
-      if (!res.ok) throw new Error('Failed to update project');
+  
       fetchProjects();
       handleCloseModals();
     } catch (err) {
@@ -385,7 +385,7 @@ export default function ProjectTable() {
   const renderTableView = () => {
     return (
       <MotionPaper
-        
+
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
