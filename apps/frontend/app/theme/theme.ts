@@ -1,4 +1,3 @@
-// theme.ts
 import { createTheme } from '@mui/material/styles';
 
 const getTheme = (mode: 'light' | 'dark') => {
@@ -31,7 +30,7 @@ const getTheme = (mode: 'light' | 'dark') => {
       divider: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.08)',
     },
     typography: {
-      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+      fontFamily: '"DM Mono", "Inter", "Roboto", "Arial", sans-serif;',
       h1: {
         fontWeight: 700,
       },

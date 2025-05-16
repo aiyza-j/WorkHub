@@ -41,8 +41,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open, role }) => {
           { label: 'Users', icon: <PersonIcon />, path: '/dashboard/admin' },
         ]
       : [
-          { label: 'Projects', icon: <WorkIcon />, path: '/project' },
-          { label: 'Tasks', icon: <AssignmentIcon />, path: '/task' },
+          { label: 'My Projects', icon: <WorkIcon />, path: '/project' },
+          { label: 'My Tasks', icon: <AssignmentIcon />, path: '/task' },
         ];
 
   const sidebarWidth = open ? { xs: 220, sm: 240 } : { xs: 65, sm: 70 };
