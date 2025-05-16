@@ -29,7 +29,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, role }) => {
   const navItems =
     role === 'admin'
       ? [
-          { label: 'Users', icon: <PersonIcon />, path: '/dashbaord/admin' },
+          { label: 'Users', icon: <PersonIcon />, path: '/dashboard/admin' },
         ]
       : [
           { label: 'Projects', icon: <WorkIcon />, path: '/project' },
@@ -61,8 +61,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open, role }) => {
                 sx={{
                   color:
                     theme.palette.mode === 'light'
-                      ? theme.palette.primary.contrastText
-                      : theme.palette.secondary.contrastText,
+                      ? theme.palette.secondary.contrastText
+                      : theme.palette.primary.contrastText,
                 }}
               >
                 {item.icon}
@@ -73,8 +73,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open, role }) => {
                   sx={{
                     color:
                       theme.palette.mode === 'light'
-                        ? theme.palette.primary.contrastText
-                        : theme.palette.secondary.contrastText,
+                        ? theme.palette.secondary.contrastText
+                        : theme.palette.primary.contrastText,
                   }}
                 />
               )}

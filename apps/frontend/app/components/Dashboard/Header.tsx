@@ -53,7 +53,7 @@ const Header = ({ toggleTheme, mode, toggleSidebar, sidebarOpen }: HeaderProps) 
             sx={{
               backgroundColor: theme.palette.mode === 'light' ? theme.palette.primary.main : theme.palette.secondary.main,
               color: theme.palette.mode === 'light' ? theme.palette.primary.contrastText : theme.palette.secondary.contrastText,
-              border: '1px solid #3c096c', borderRadius: '5px'
+              border: '1px solid #ffffff', borderRadius: '5px'
             }}
           >
             Logout

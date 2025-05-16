@@ -5,12 +5,12 @@ const getTheme = (mode: 'light' | 'dark') => {
     palette: {
       mode,
       primary: {
-        main: '#ffffff',
-        contrastText: '#3c096c',
-      },
-      secondary: {
         main: '#3c096c',
         contrastText: '#ffffff',
+      },
+      secondary: {
+        main: '#ffffff',
+        contrastText: '#3c096c',
       },
       text: {
         primary: mode === 'light' ? '#000000' : '#ffffff',
@@ -24,17 +24,7 @@ const getTheme = (mode: 'light' | 'dark') => {
     components: {
       MuiButton: {
         defaultProps: {
-          variant: 'contained',
-        },
-        styleOverrides: {
-          outlined: {
-            color: mode === 'dark' ? '#ffffff' : '#3c096c',
-            borderColor: mode === 'dark' ? '#ffffff' : '#3c096c',
-            '&:hover': {
-              borderColor: mode === 'dark' ? '#ffffff' : '#3c096c',
-              backgroundColor: mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(60, 9, 108, 0.04)',
-            },
-          },
+          variant: 'contained', // Optional default, can remove if you want full defaults
         },
       },
     },
