@@ -5,7 +5,7 @@ import { Box, CircularProgress } from '@mui/material';
 import Sidebar from '../components/Dashboard/Sidebar';
 import Header from '../components/Dashboard/Header';
 import ThemeRegistry from '../theme/ThemeRegistry';
-import { useSession } from '../hooks/useSession'; // adjust path if different
+import { useSession } from '../hooks/useSession'; 
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const { session, loading } = useSession();

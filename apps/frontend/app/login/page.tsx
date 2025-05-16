@@ -93,7 +93,7 @@ const LoginPage = () => {
           variant="h4"
           gutterBottom
           textAlign="center"
-          color="secondary"
+          color="primary"
         >
           Log In
         </Typography>
@@ -139,7 +139,7 @@ const LoginPage = () => {
             type="submit"
             fullWidth
             variant="contained"
-            color="secondary"
+            color="primary"
             sx={{ mt: 2, py: 1.5 }}
           >
             Log In
@@ -149,7 +149,7 @@ const LoginPage = () => {
             Don’t have an account?{' '}
             <Link
               onClick={() => router.push('/signup')}
-              sx={{ cursor: 'pointer', color: 'secondary.main', fontWeight: 500 }}
+              sx={{ cursor: 'pointer', color: 'primary.main', fontWeight: 500 }}
               underline="hover"
             >
               Sign up

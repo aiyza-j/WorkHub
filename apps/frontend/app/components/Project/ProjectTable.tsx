@@ -63,7 +63,7 @@ export default function ProjectTable() {
   const [uniqueOwners, setUniqueOwners] = useState<string[]>([]);
   const router = useRouter();
 
-  // Fetch projects with server-side filtering, pagination
+
   const fetchProjects = async () => {
   setLoading(true);
   setError(null);
@@ -306,7 +306,7 @@ export default function ProjectTable() {
                         <>
                           <Button
                             variant="outlined"
-                            color="secondary"
+                            color="primary"
                             onClick={(e) => {e.stopPropagation(); handleEdit(project)}}
                             sx={{ mr: 1 }}
                           >
@@ -315,7 +315,7 @@ export default function ProjectTable() {
                           <Button
                             variant="outlined"
                             color="error"
-                            onClick={() => handleOpenDeleteModal(project)}
+                            onClick={(e) => {e.stopPropagation(); handleOpenDeleteModal(project)}}
                           >
                             Delete
                           </Button>

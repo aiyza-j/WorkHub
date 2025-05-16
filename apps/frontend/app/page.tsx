@@ -13,17 +13,17 @@ const features = [
   {
     title: 'User Management',
     description: 'Easily add, update, and organize your team members.',
-    icon: <PeopleIcon fontSize="large" color="primary" />,
+    icon: <PeopleIcon fontSize="large" color="secondary" />,
   },
   {
     title: 'Project Tracking',
     description: 'Manage project timelines and team responsibilities.',
-    icon: <AssignmentIcon fontSize="large" color="primary" />,
+    icon: <AssignmentIcon fontSize="large" color="secondary" />,
   },
   {
     title: 'Task Collaboration',
     description: 'Assign tasks and track progress across your team.',
-    icon: <ListAltIcon fontSize="large" color="primary" />,
+    icon: <ListAltIcon fontSize="large" color="secondary" />,
   },
 ];
 
@@ -33,17 +33,17 @@ const LandingPage = () => {
     <Container maxWidth="lg" sx={{ py: 8 }}>
 
       <Box textAlign="center" mb={6}>
-        <Typography variant="h2" component="h1" gutterBottom color="secondary">
+        <Typography variant="h2" component="h1" gutterBottom color="primary">
           Welcome to WorkHub
         </Typography>
-        <Typography variant="h6" color="text.secondary" paragraph>
+        <Typography variant="h6" color="text.primary" paragraph>
           Manage users, projects, and tasks — all in one place.
         </Typography>
         <Box textAlign="center" mt={5}>
         <Typography variant="h5" gutterBottom>
           Ready to streamline your workflow?
         </Typography>
-        <Button variant="contained" color="secondary" size="large" onClick={() => router.push('/signup')}>
+        <Button variant="contained" color="primary" size="large" onClick={() => router.push('/signup')}>
           Sign Up for Free
         </Button>
       </Box>
@@ -58,7 +58,7 @@ const LandingPage = () => {
                 <Typography variant="h6" gutterBottom>
                   {feature.title}
                 </Typography>
-                <Typography variant="body2" color="primary">
+                <Typography variant="body2" color="secondary">
                   {feature.description}
                 </Typography>
               </Paper>

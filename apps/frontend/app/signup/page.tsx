@@ -99,7 +99,7 @@ const SignUpPage = () => {
                 showError(data.message || 'Signup Failed');
             }
             } else {
-            alert('Sign-up successful!');
+      
             router.push('/login');
             }
         } catch (error: any) {
@@ -122,7 +122,7 @@ const SignUpPage = () => {
       }}
     >
       <Paper elevation={3} sx={{ p: 4, width: '100%', maxWidth: 500 }}>
-        <Typography variant="h4" gutterBottom textAlign="center" color="secondary">
+        <Typography variant="h4" gutterBottom textAlign="center" color="primary">
           Sign Up
         </Typography>
 
@@ -192,7 +192,7 @@ const SignUpPage = () => {
             type="submit"
             fullWidth
             variant="contained"
-            color="secondary"
+            color="primary"
             sx={{ mt: 2, py: 1.5 }}
           >
             Create Account
@@ -202,7 +202,7 @@ const SignUpPage = () => {
             Already have an account?{' '}
             <Link
               onClick={() => router.push('/login')}
-              sx={{ cursor: 'pointer', color: 'secondary.main', fontWeight: 500 }}
+              sx={{ cursor: 'pointer', color: 'primary.main', fontWeight: 500 }}
               underline="hover"
             >
               Log in

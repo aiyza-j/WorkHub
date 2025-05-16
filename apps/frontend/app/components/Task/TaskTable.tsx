@@ -234,7 +234,7 @@ export default function TaskTable() {
           mt: 5,
         }}
       >
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center'}}>
           <TextField
             label="Search"
             variant="outlined"

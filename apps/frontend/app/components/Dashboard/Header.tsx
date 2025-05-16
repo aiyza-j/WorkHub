@@ -35,7 +35,7 @@ const Header = ({ toggleTheme, mode, toggleSidebar, sidebarOpen }: HeaderProps) 
           </IconButton>
           <Typography
             variant="h6"
-            color={theme.palette.mode === 'dark' ? theme.palette.secondary.contrastText : theme.palette.primary.contrastText}
+            color={theme.palette.mode === 'dark' ? "secondary" : "secondary"}
             noWrap
           >
             WorkHub
