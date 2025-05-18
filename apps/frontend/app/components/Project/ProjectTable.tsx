@@ -5,64 +5,24 @@ import {
   Box,
   Typography,
   CircularProgress,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Modal,
   TextField,
   Button,
-  MenuItem,
-  Select,
-  Pagination,
-  InputAdornment,
   useTheme,
   useMediaQuery,
-  Card,
-  IconButton,
-  Fade,
-  Backdrop,
-  alpha,
+  InputAdornment,
+  Pagination,
+  alpha
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-
-// Wrap components with motion
-const MotionTableRow = motion(TableRow);
-const MotionCard = motion(Card);
-const MotionPaper = motion(Paper);
-
-interface Project {
-  _id: string;
-  name: string;
-  description: string;
-  owner_email: string;
-}
-
-interface ServerResponse {
-  projects: Project[];
-  totalCount: number;
-}
-
-const modalStyle = {
-  position: 'absolute' as const,
-  top: '30%',
-  left: '40%',
-  transform: 'translate(-50%, -50%)',
-  width: { xs: '90%', sm: 400 },
-  bgcolor: 'background.paper',
-  p: 4,
-  borderRadius: 2,
-  boxShadow: 24,
-  outline: 'none',
-};
+import { Project, ServerResponse } from '../../models/Project';
+import { fetchProjects, createProject, updateProject, deleteProject } from '../../services/projectServices';
+import CreateModal from '../CreateModal';
+import DeleteModal from './DeleteModal';
+import MobileView from './MobileView';
+import TableView from './TableView';
 
 const ITEMS_PER_PAGE = 5;
 
@@ -75,31 +35,18 @@ export default function ProjectTable() {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [emailFilter, setEmailFilter] = useState('');
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [uniqueOwners, setUniqueOwners] = useState<string[]>([]);
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const fetchProjects = async () => {
+  const loadProjects = async () => {
     setLoading(true);
     setError(null);
-    const token = localStorage.getItem('token');
-
-    const params = new URLSearchParams();
-    params.append('page', page.toString());
-    params.append('limit', ITEMS_PER_PAGE.toString());
-    if (searchTerm) params.append('search', searchTerm);
 
     try {
-      const res = await fetch(`http://localhost:5000/api/projects/?${params.toString()}`, {
-        headers: { Authorization: token || '' },
-      });
-      if (!res.ok) throw new Error('Failed to fetch projects');
-      const data: ServerResponse = await res.json();
-
+      const data = await fetchProjects(page, ITEMS_PER_PAGE, searchTerm);
       setProjects(data.projects);
       setTotalCount(data.totalCount);
     } catch (err: any) {
@@ -111,15 +58,13 @@ export default function ProjectTable() {
     }
   };
 
-  // Refetch projects on filters or page change
   useEffect(() => {
-    fetchProjects();
-  }, [searchTerm, emailFilter, page]);
+    loadProjects();
+  }, [searchTerm, page]);
 
-  // Reset to page 1 if filters change
   useEffect(() => {
     setPage(1);
-  }, [searchTerm, emailFilter]);
+  }, [searchTerm]);
 
   const handleOpenCreateModal = () => {
     setSelectedProject({ _id: '', name: '', description: '', owner_email: '' });
@@ -140,20 +85,10 @@ export default function ProjectTable() {
 
   const handleCreate = async () => {
     if (!selectedProject?.name || !selectedProject?.description) return;
-    const token = localStorage.getItem('token');
+
     try {
-      await fetch('http://localhost:5000/api/projects/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: token || '',
-        },
-        body: JSON.stringify({
-          name: selectedProject.name,
-          description: selectedProject.description,
-        }),
-      });
-      fetchProjects();
+      await createProject(selectedProject.name, selectedProject.description);
+      loadProjects();
       handleCloseModals();
     } catch (err) {
       console.error(err);
@@ -162,24 +97,10 @@ export default function ProjectTable() {
 
   const handleSave = async () => {
     if (!selectedProject) return;
-    const token = localStorage.getItem('token');
 
     try {
-      const res = await fetch('http://localhost:5000/api/projects/update', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: token || '',
-        },
-        body: JSON.stringify({
-          project_id: selectedProject._id,
-          name: selectedProject.name,
-          description: selectedProject.description,
-        }),
-      });
-
-
-      fetchProjects();
+      await updateProject(selectedProject._id, selectedProject.name, selectedProject.description);
+      loadProjects();
       handleCloseModals();
     } catch (err) {
       console.error(err);
@@ -188,17 +109,10 @@ export default function ProjectTable() {
 
   const handleDelete = async () => {
     if (!selectedProject?._id) return;
-    const token = localStorage.getItem('token');
+
     try {
-      await fetch('http://localhost:5000/api/projects/delete', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: token || '',
-        },
-        body: JSON.stringify({ project_id: selectedProject._id }),
-      });
-      fetchProjects();
+      await deleteProject(selectedProject._id);
+      loadProjects();
       handleCloseModals();
     } catch (err) {
       console.error(err);
@@ -213,315 +127,6 @@ export default function ProjectTable() {
   const handleCancelEdit = () => {
     setEditingProjectId(null);
     setSelectedProject(null);
-  };
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: 'spring',
-        stiffness: 300,
-        damping: 24
-      }
-    }
-  };
-
-  // Mobile Card View for projects
-  const renderMobileView = () => {
-    return (
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {projects.length === 0 ? (
-          <MotionCard
-            variants={itemVariants}
-            sx={{ p: 3, textAlign: 'center', mb: 2 }}
-          >
-            <Typography variant="body1">No projects yet.</Typography>
-          </MotionCard>
-        ) : (
-          projects.map((project) => (
-            <MotionCard
-              key={project._id.toString()}
-              variants={itemVariants}
-              sx={{
-                p: 2,
-                mb: 2,
-                position: 'relative',
-                cursor: editingProjectId === project._id ? 'default' : 'pointer',
-                '&:hover': {
-                  boxShadow: 4,
-                  transform: editingProjectId === project._id ? 'none' : 'translateY(-2px)',
-                  transition: 'all 0.3s ease-in-out',
-                }
-              }}
-              onClick={() => {
-                if (!editingProjectId) {
-                  router.push(`/task?projectId=${project._id}`);
-                }
-              }}
-            >
-              <Box sx={{ mb: 1 }}>
-                {editingProjectId === project._id ? (
-                  <TextField
-                    fullWidth
-                    label="Name"
-                    value={selectedProject?.name || ''}
-                    onChange={(e) => setSelectedProject((prev) => ({ ...prev!, name: e.target.value }))}
-                    size="small"
-                    sx={{ mb: 2 }}
-                  />
-                ) : (
-                  <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
-                    {project.name}
-                  </Typography>
-                )}
-              </Box>
-
-              <Box sx={{ mb: 2 }}>
-                {editingProjectId === project._id ? (
-                  <TextField
-                    fullWidth
-                    label="Description"
-                    value={selectedProject?.description || ''}
-                    onChange={(e) => setSelectedProject((prev) => ({ ...prev!, description: e.target.value }))}
-                    size="small"
-                    multiline
-                    rows={2}
-                  />
-                ) : (
-                  <Typography variant="body2" color="text.secondary">
-                    {project.description}
-                  </Typography>
-                )}
-              </Box>
-
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="caption" color="text.secondary">
-                  Owner: {project.owner_email}
-                </Typography>
-
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                  {editingProjectId === project._id ? (
-                    <>
-                      <Button
-                        size="small"
-                        variant="contained"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSave();
-                        }}
-                      >
-                        Save
-                      </Button>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCancelEdit();
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <IconButton
-                        size="small"
-                        color="primary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEdit(project);
-                        }}
-                        sx={{
-                          transition: 'transform 0.2s',
-                          '&:hover': { transform: 'scale(1.1)' }
-                        }}
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        color="error"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenDeleteModal(project);
-                        }}
-                        sx={{
-                          transition: 'transform 0.2s',
-                          '&:hover': { transform: 'scale(1.1)' }
-                        }}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </>
-                  )}
-                </Box>
-              </Box>
-            </MotionCard>
-          ))
-        )}
-      </motion.div>
-    );
-  };
-
-  // Table View for desktop
-  const renderTableView = () => {
-    return (
-      <MotionPaper
-
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        elevation={3}
-        sx={{ width: '100%', mb: 2, borderRadius: 2, overflow: 'hidden' }}
-      >
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1) }}>
-                <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Description</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Owner</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody component={motion.tbody} variants={containerVariants} initial="hidden" animate="visible">
-              {projects.length === 0 ? (
-                <MotionTableRow variants={itemVariants}>
-                  <TableCell colSpan={4} align="center">
-                    <Typography py={2}>No projects yet.</Typography>
-                  </TableCell>
-                </MotionTableRow>
-              ) : (
-                projects.map((project) => (
-                  <MotionTableRow
-                    key={project._id.toString()}
-                    hover
-                    variants={itemVariants}
-                    onClick={() => {
-                      if (!editingProjectId) {
-                        router.push(`/task?projectId=${project._id}`);
-                      }
-                    }}
-                    sx={{
-                      cursor: editingProjectId === project._id ? 'default' : 'pointer',
-                      transition: 'background-color 0.3s',
-                      '&:hover': {
-                        backgroundColor: alpha(theme.palette.primary.main, 0.05),
-                      }
-                    }}
-                  >
-                    <TableCell>
-                      {editingProjectId === project._id ? (
-                        <TextField
-                          value={selectedProject?.name || ''}
-                          onChange={(e) =>
-                            setSelectedProject((prev) => ({ ...prev!, name: e.target.value }))
-                          }
-                          size="small"
-                          fullWidth
-                        />
-                      ) : (
-                        <Typography fontWeight="medium">{project.name}</Typography>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {editingProjectId === project._id ? (
-                        <TextField
-                          value={selectedProject?.description || ''}
-                          onChange={(e) =>
-                            setSelectedProject((prev) => ({
-                              ...prev!,
-                              description: e.target.value,
-                            }))
-                          }
-                          size="small"
-                          fullWidth
-                        />
-                      ) : (
-                        project.description
-                      )}
-                    </TableCell>
-                    <TableCell>{project.owner_email}</TableCell>
-                    <TableCell>
-                      {editingProjectId === project._id ? (
-                        <Box sx={{ display: 'flex', gap: 1 }}>
-                          <Button
-                            variant="contained"
-                            onClick={(e) => {e.stopPropagation(); handleSave()}}
-                            size="small"
-                            sx={{
-                              px: 2,
-                              transition: 'transform 0.2s',
-                              '&:hover': { transform: 'scale(1.05)' }
-                            }}
-                          >
-                            Save
-                          </Button>
-                          <Button
-                            variant="outlined"
-                            onClick={(e) => {e.stopPropagation(); handleCancelEdit()}}
-                            size="small"
-                            sx={{
-                              transition: 'transform 0.2s',
-                              '&:hover': { transform: 'scale(1.05)' }
-                            }}
-                          >
-                            Cancel
-                          </Button>
-                        </Box>
-                      ) : (
-                        <Box sx={{ display: 'flex', gap: 1 }}>
-                          <IconButton
-                            color="primary"
-                            onClick={(e) => {e.stopPropagation(); handleEdit(project)}}
-                            size="small"
-                            sx={{
-                              transition: 'all 0.2s',
-                              '&:hover': { transform: 'scale(1.1)' }
-                            }}
-                          >
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                          <IconButton
-                            color="error"
-                            onClick={(e) => {e.stopPropagation(); handleOpenDeleteModal(project)}}
-                            size="small"
-                            sx={{
-                              transition: 'all 0.2s',
-                              '&:hover': { transform: 'scale(1.1)' }
-                            }}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Box>
-                      )}
-                    </TableCell>
-                  </MotionTableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </MotionPaper>
-    );
   };
 
   return (
@@ -635,7 +240,32 @@ export default function ProjectTable() {
         </Box>
       ) : (
         <>
-          {isMobile ? renderMobileView() : renderTableView()}
+          {isMobile ? (
+            <MobileView
+              projects={projects}
+              editingProjectId={editingProjectId}
+              selectedProject={selectedProject}
+              router={router}
+              handleEdit={handleEdit}
+              handleSave={handleSave}
+              handleCancelEdit={handleCancelEdit}
+              handleOpenDeleteModal={handleOpenDeleteModal}
+              setSelectedProject={setSelectedProject}
+            />
+          ) : (
+            <TableView
+              projects={projects}
+              editingProjectId={editingProjectId}
+              selectedProject={selectedProject}
+              router={router}
+              theme={theme}
+              handleEdit={handleEdit}
+              handleSave={handleSave}
+              handleCancelEdit={handleCancelEdit}
+              handleOpenDeleteModal={handleOpenDeleteModal}
+              setSelectedProject={setSelectedProject}
+            />
+          )}
 
           <Box
             sx={{
@@ -666,145 +296,20 @@ export default function ProjectTable() {
         </>
       )}
 
-      {/* Create Modal */}
-      <Modal
+      <CreateModal
         open={openCreateModal}
-        onClose={handleCloseModals}
-        closeAfterTransition
-        slots={{ backdrop: Backdrop }}
-        slotProps={{
-          backdrop: {
-            timeout: 500,
-          },
-        }}
-      >
-        <Fade in={openCreateModal}>
-          <Box sx={modalStyle} component={motion.div} initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-            <Typography variant="h6" mb={3} fontWeight="600">
-              Create New Project
-            </Typography>
-            <TextField
-              fullWidth
-              label="Project Name"
-              value={selectedProject?.name || ''}
-              onChange={(e) =>
-                setSelectedProject((prev) => ({ ...prev!, name: e.target.value }))
-              }
-              sx={{ mb: 3 }}
-              InputProps={{
-                sx: {
-                  borderRadius: 1.5,
-                }
-              }}
-            />
-            <TextField
-              fullWidth
-              label="Description"
-              value={selectedProject?.description || ''}
-              onChange={(e) =>
-                setSelectedProject((prev) => ({ ...prev!, description: e.target.value }))
-              }
-              sx={{ mb: 3 }}
-              multiline
-              rows={3}
-              InputProps={{
-                sx: {
-                  borderRadius: 1.5,
-                }
-              }}
-            />
-            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-              <Button
-                variant="outlined"
-                onClick={handleCloseModals}
-                sx={{
-                  borderRadius: 1.5,
-                  textTransform: 'none',
-                  transition: 'all 0.2s',
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                  }
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="contained"
-                onClick={handleCreate}
-                sx={{
-                  borderRadius: 1.5,
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  transition: 'all 0.2s',
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: 3,
-                  }
-                }}
-              >
-                Create
-              </Button>
-            </Box>
-          </Box>
-        </Fade>
-      </Modal>
+        handleClose={handleCloseModals}
+        selectedProject={selectedProject}
+        setSelectedProject={setSelectedProject}
+        handleCreate={handleCreate}
+      />
 
-      {/* Delete Modal */}
-      <Modal
+      <DeleteModal
         open={openDeleteModal}
-        onClose={handleCloseModals}
-        closeAfterTransition
-        slots={{ backdrop: Backdrop }}
-        slotProps={{
-          backdrop: {
-            timeout: 500,
-          },
-        }}
-      >
-        <Fade in={openDeleteModal}>
-          <Box sx={modalStyle} component={motion.div} initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-            <Typography variant="h6" mb={2} fontWeight="600">
-              Confirm Delete
-            </Typography>
-            <Typography mb={3}>
-              Are you sure you want to delete project <strong>{selectedProject?.name}</strong>?
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-              <Button
-                variant="outlined"
-                onClick={handleCloseModals}
-                sx={{
-                  borderRadius: 1.5,
-                  textTransform: 'none',
-                  transition: 'all 0.2s',
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                  }
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="contained"
-                color="error"
-                onClick={handleDelete}
-                sx={{
-                  borderRadius: 1.5,
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  transition: 'all 0.2s',
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: 3,
-                  }
-                }}
-              >
-                Delete
-              </Button>
-            </Box>
-          </Box>
-        </Fade>
-      </Modal>
+        handleClose={handleCloseModals}
+        selectedProject={selectedProject}
+        handleDelete={handleDelete}
+      />
     </Box>
   );
 }
