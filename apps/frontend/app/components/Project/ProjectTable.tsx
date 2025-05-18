@@ -17,7 +17,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Project, ServerResponse } from '../../models/Project';
+import { Project, ServerResponse } from '../../types/Project';
 import { fetchProjects, createProject, updateProject, deleteProject } from '../../services/projectServices';
 import CreateModal from '../CreateModal';
 import DeleteModal from './DeleteModal';

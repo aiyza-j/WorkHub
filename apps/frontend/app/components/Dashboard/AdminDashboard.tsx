@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { motion } from 'framer-motion';
-import { User } from '../../models/User';
+import { User } from '../../types/User';
 import { fetchUsers, updateUser, deleteUser } from '../../services/userService';
 import {
   tableContainerVariants,

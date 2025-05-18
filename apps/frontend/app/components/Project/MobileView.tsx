@@ -8,7 +8,7 @@ import {
   IconButton,
 } from '@mui/material';
 import { motion } from 'framer-motion';
-import { Project } from '../../models/Project';
+import { Project } from '../../types/Project';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { containerVariants, itemVariants } from '../Project/styles';

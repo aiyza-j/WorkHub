@@ -1,4 +1,4 @@
-import {ServerResponse} from '../models/Project'
+import {ServerResponse} from '../types/Project'
 
 export const fetchProjects = async (page: number, limit: number, searchTerm: string) => {
   const token = localStorage.getItem('token');

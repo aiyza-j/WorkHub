@@ -8,7 +8,7 @@ import {
   Backdrop,
 } from '@mui/material';
 import { motion } from 'framer-motion';
-import { Project } from '../../models/Project';
+import { Project } from '../../types/Project';
 import { modalStyle } from '../Project/styles';
 
 interface DeleteModalProps {

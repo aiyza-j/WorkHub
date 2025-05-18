@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, current_app
 from utils.decorators import token_required
-from models.task import create_task, get_tasks_by_project, update_task_status, delete_task, get_user_tasks
+from models.task import create_task, get_tasks_by_project, update_task_status, delete_task, get_user_tasks, update_task
 from extensions import mongo
 
 task_bp = Blueprint("tasks", __name__)
@@ -68,3 +68,21 @@ def get_user_tasks_route(current_user):
         "page": page,
         "per_page": per_page
     })
+
+@task_bp.route("/update", methods=["PUT"])
+@token_required
+def update(current_user):
+    data = request.json
+    task_id = data.get("task_id")
+    updates = data.get("updates", {})
+
+    if not task_id or not updates:
+        return jsonify({"error": "Missing task_id or updates"}), 400
+
+    result = update_task(task_id, updates)
+
+    if result is None:
+        return jsonify({"error": "No valid fields to update"}), 400
+
+    return jsonify({"updated": result.modified_count})
+

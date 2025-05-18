@@ -23,7 +23,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import PersonIcon from '@mui/icons-material/Person';
-import { User } from '../../models/User';
+import { User } from '../../types/User';
 import { rowVariants, getStyles } from './dashboardStyles';
 
 interface UserTableProps {

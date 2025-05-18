@@ -1,4 +1,4 @@
-import { User, ServerResponse } from '../models/User';
+import { User, ServerResponse } from '../types/User';
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
@@ -51,4 +51,17 @@ export const deleteUser = async (email: string): Promise<void> => {
   });
 
   if (!res.ok) throw new Error('Failed to delete user');
+};
+
+export const fetchUserEmails = async (): Promise<string[]> => {
+  const token = localStorage.getItem('token');
+
+  const res = await fetch(`${API_BASE_URL}/users/emails`, {
+    headers: { Authorization: token || '' },
+  });
+
+  if (!res.ok) throw new Error('Failed to fetch user emails');
+
+  const data = await res.json();
+  return data.emails;
 };

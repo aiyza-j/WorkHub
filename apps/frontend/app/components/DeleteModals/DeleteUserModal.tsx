@@ -12,7 +12,7 @@ import {
   Backdrop
 } from '@mui/material';
 import { motion } from 'framer-motion';
-import { User } from '../../models/User';
+import { User } from '../../types/User';
 
 interface DeleteUserModalProps {
   open: boolean;

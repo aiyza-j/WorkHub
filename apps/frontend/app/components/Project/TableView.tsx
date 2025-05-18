@@ -14,7 +14,7 @@ import {
   IconButton,
 } from '@mui/material';
 import { motion } from 'framer-motion';
-import { Project } from '../../models/Project';
+import { Project } from '../../types/Project';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
@@ -58,7 +58,7 @@ const TableView: React.FC<TableViewProps> = ({
       <TableContainer>
         <Table>
           <TableHead>
-            <TableRow sx={{ bgcolor: 'background.paper' }}>
+            <TableRow sx={{ backgroundColor: "rgba(60, 9, 108, 0.05)" }}>
               <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
               <TableCell sx={{ fontWeight: 'bold' }}>Description</TableCell>
               <TableCell sx={{ fontWeight: 'bold' }}>Owner</TableCell>

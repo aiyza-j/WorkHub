@@ -9,7 +9,7 @@ import {
   Backdrop,
 } from '@mui/material';
 import { motion } from 'framer-motion';
-import { Project } from '../models/Project';
+import { Project } from '../types/Project';
 import { modalStyle } from '../components/Project/styles';
 
 interface CreateModalProps {
@@ -27,6 +27,28 @@ const CreateModal: React.FC<CreateModalProps> = ({
   setSelectedProject,
   handleCreate,
 }) => {
+  // Safe default values
+  const safeProject = selectedProject || {
+    _id: '',
+    name: '',
+    description: '',
+    owner_email: ''
+  };
+
+  // Check if all required fields are filled
+  const isFormValid = () => {
+    return (
+      safeProject.name.trim() !== '' &&
+      safeProject.description.trim() !== ''
+    );
+  };
+
+  const handleSubmit = () => {
+    if (isFormValid()) {
+      handleCreate();
+    }
+  };
+
   return (
     <Modal
       open={open}
@@ -46,10 +68,10 @@ const CreateModal: React.FC<CreateModalProps> = ({
           </Typography>
           <TextField
             fullWidth
-            label="Project Name"
-            value={selectedProject?.name || ''}
+            label="Project Name "
+            value={safeProject.name}
             onChange={(e) =>
-              setSelectedProject({ ...selectedProject!, name: e.target.value })
+              setSelectedProject({ ...safeProject, name: e.target.value })
             }
             sx={{ mb: 3 }}
             InputProps={{
@@ -57,13 +79,14 @@ const CreateModal: React.FC<CreateModalProps> = ({
                 borderRadius: 1.5,
               }
             }}
+
           />
           <TextField
             fullWidth
-            label="Description"
-            value={selectedProject?.description || ''}
+            label="Description "
+            value={safeProject.description}
             onChange={(e) =>
-              setSelectedProject({ ...selectedProject!, description: e.target.value })
+              setSelectedProject({ ...safeProject, description: e.target.value })
             }
             sx={{ mb: 3 }}
             multiline
@@ -73,6 +96,7 @@ const CreateModal: React.FC<CreateModalProps> = ({
                 borderRadius: 1.5,
               }
             }}
+
           />
           <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
             <Button
@@ -91,7 +115,8 @@ const CreateModal: React.FC<CreateModalProps> = ({
             </Button>
             <Button
               variant="contained"
-              onClick={handleCreate}
+              onClick={handleSubmit}
+              disabled={!isFormValid()}
               sx={{
                 borderRadius: 1.5,
                 textTransform: 'none',

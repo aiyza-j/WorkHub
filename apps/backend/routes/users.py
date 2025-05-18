@@ -85,3 +85,10 @@ def update_user(current_user):
         return jsonify({"message": "No changes made or user not found"}), 404
 
     return jsonify({"message": f"User with email {email} updated", "modified": result.modified_count}), 200
+
+@user_bp.route("/emails", methods=["GET"])
+@token_required
+def get_user_emails(current_user):
+    users_cursor = mongo.db.users.find({}, {"email": 1})
+    emails = [user["email"] for user in users_cursor]
+    return jsonify({"emails": emails})

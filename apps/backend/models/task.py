@@ -1,5 +1,7 @@
 import datetime
 from extensions import mongo
+import re
+from bson import ObjectId
 
 def create_task(title, description, project_id, assignee_email):
     task = {
@@ -69,3 +71,12 @@ def get_user_tasks(user_email, search="", status="", page=1, per_page=10):
     total = mongo.db.tasks.count_documents(query)
 
     return tasks, total
+
+def update_task(task_id, updates):
+    allowed_fields = {"title", "description", "assignee", "status"}
+    update_fields = {key: value for key, value in updates.items() if key in allowed_fields}
+
+    if not update_fields:
+        return None 
+
+    return mongo.db.tasks.update_one({"_id": ObjectId(task_id)}, {"$set": update_fields})
