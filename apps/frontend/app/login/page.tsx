@@ -108,10 +108,10 @@ const LoginPage = () => {
         } else {
           showError(data.message || 'Invalid credentials');
         }
-      } else {
-        alert('Login Successfull successful!');
+      }  else {
+        const DashboardComponent = (await import('../../app/dashboard/DashboardRedirect')).default;
         router.push('/dashboard');
-      }
+    }
     } catch (error: any) {
       console.error('Sign-up error:', error);
       showError(error.message || 'Something went wrong.');

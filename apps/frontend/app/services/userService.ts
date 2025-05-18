@@ -26,19 +26,32 @@ export const fetchUsers = async (
 export const updateUser = async (user: User): Promise<void> => {
   const token = localStorage.getItem('token');
 
+  // Extract only the necessary fields to update
+  const userData = {
+    _id: user._id,
+    email: user.email,
+    full_name: user.full_name,
+  };
+
+  console.log('Sending update request:', userData);
+
   const res = await fetch(`${API_BASE_URL}/users/update`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
       Authorization: token || '',
     },
-    body: JSON.stringify(user),
+    body: JSON.stringify(userData),
   });
 
-  if (!res.ok) throw new Error('Failed to update user');
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error('Failed to update user:', res.status, errorText);
+    throw new Error('Failed to update user');
+  }
 };
 
-export const deleteUser = async (email: string): Promise<void> => {
+export const deleteUser = async (id: string): Promise<void> => {
   const token = localStorage.getItem('token');
 
   const res = await fetch(`${API_BASE_URL}/users/delete`, {
@@ -47,7 +60,7 @@ export const deleteUser = async (email: string): Promise<void> => {
       'Content-Type': 'application/json',
       Authorization: token || '',
     },
-    body: JSON.stringify({ email }),
+    body: JSON.stringify({ id }),
   });
 
   if (!res.ok) throw new Error('Failed to delete user');

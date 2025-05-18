@@ -1,4 +1,5 @@
   import React, { useEffect, useState, useCallback } from 'react';
+  import dynamic from 'next/dynamic';
   import {
     Box,
     Typography,
@@ -19,12 +20,11 @@
   import { Task, ServerResponse, STATUS_OPTIONS, ITEMS_PER_PAGE } from '../../types/Task';
   import { fetchTasks, createTask, deleteTask, updateTask } from '../../services/taskServices';
   import { fetchUserEmails } from '../../services/userService';
-  import CreateModal from './createModal';
-  import DeleteModal from './DeleteModal';
-  import TaskTableView from './TaskTableView';
-  import MobileTaskView from './MobileTaskView';
+const CreateModal = dynamic(() => import('./createModal'));
+const DeleteModal = dynamic(() => import('./DeleteModal'));
+const TaskTableView = dynamic(() => import('./TaskTableView'));
+const MobileTaskView = dynamic(() => import('./MobileTaskView'));
   import { SelectChangeEvent } from '@mui/material/Select';
-  import { tableHeaderStyle, statusBadgeStyle, actionButtonStyle } from './styles';
 
   const TaskTable = () => {
     const [tasks, setTasks] = useState<Task[]>([]);

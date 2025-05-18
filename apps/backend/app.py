@@ -37,5 +37,6 @@ app.register_blueprint(user_bp, url_prefix="/api/users")
 app.register_blueprint(project_bp, url_prefix="/api/projects")
 app.register_blueprint(task_bp, url_prefix="/api/tasks")
 
+
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

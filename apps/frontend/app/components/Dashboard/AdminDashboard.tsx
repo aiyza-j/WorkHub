@@ -21,7 +21,7 @@ import {
   tableContainerVariants,
   getStyles
 } from './dashboardStyles';
-import DeleteUserModal from '../DeleteModals/DeleteUserModal';
+const DeleteUserModal = React.lazy(() => import('../DeleteModals/DeleteUserModal'));
 import UserTable from './UserTable';
 
 const AdminDashboard = () => {
@@ -91,7 +91,7 @@ const AdminDashboard = () => {
     if (!selectedUser) return;
 
     try {
-      await deleteUser(selectedUser.email);
+      await deleteUser(selectedUser._id);
       loadUsers();
       handleCloseModals();
     } catch (err) {
@@ -244,12 +244,16 @@ const AdminDashboard = () => {
         )}
 
         {/* Delete Modal */}
-        <DeleteUserModal
-          open={openDeleteModal}
-          onClose={handleCloseModals}
-          selectedUser={selectedUser}
-          onDelete={handleDelete}
-        />
+        <React.Suspense fallback={<CircularProgress />}>
+        {openDeleteModal && (
+          <DeleteUserModal
+            open={openDeleteModal}
+            onClose={handleCloseModals}
+            selectedUser={selectedUser}
+            onDelete={handleDelete}
+          />
+        )}
+      </React.Suspense>
       </Box>
     </Container>
   );

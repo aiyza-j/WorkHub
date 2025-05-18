@@ -4,7 +4,7 @@ import ThemeRegistryWithContext from "./theme/ThemeRegistryWithContext";
 import { ThemeProviderContext } from './contexts/ThemeContext';
 
 export const metadata: Metadata = {
-  title: "Create Next App",
+  title: "WorkHub",
   description: "Manage users, projects, and tasks",
 };
 

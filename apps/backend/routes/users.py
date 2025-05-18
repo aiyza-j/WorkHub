@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request
 from utils.decorators import token_required, require_role
-from models.user import get_all_users, delete_user_by_email, update_user_by_email
+from models.user import get_all_users, delete_user_by_id, update_user_by_id
 from extensions import mongo
+from bson import ObjectId
 
 user_bp = Blueprint("users", __name__)
 
@@ -45,20 +46,27 @@ def get_users(current_user):
 @require_role("admin")
 def delete_user(current_user):
     data = request.json
-    email = data.get("email")
+    print(data)
+    user_id = data.get("id")
 
-    if not email:
-        return jsonify({"error": "Email is required"}), 400
 
-    if email == current_user["email"]:
-        return jsonify({"error": "Admins cannot delete their own account"}), 403
+    if not user_id:
+        return jsonify({"error": "User ID is required"}), 400
 
-    result = delete_user_by_email(email)
-
-    if result.deleted_count == 0:
+    # Fetch user to check email before deletion
+    user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
+    if not user:
         return jsonify({"error": "User not found"}), 404
 
-    return jsonify({"message": f"User with email {email} deleted", "deleted": result.deleted_count}), 200
+    if user.get("email") == current_user["email"]:
+        return jsonify({"error": "Admins cannot delete their own account"}), 403
+
+    result = delete_user_by_id(user_id)
+
+    if not result or result.deleted_count == 0:
+        return jsonify({"error": "User not found or could not be deleted"}), 404
+
+    return jsonify({"message": f"User with id {user_id} deleted", "deleted": result.deleted_count}), 200
 
 
 @user_bp.route("/update", methods=["PUT"])
@@ -66,10 +74,10 @@ def delete_user(current_user):
 @require_role("admin")
 def update_user(current_user):
     data = request.json
-    email = data.get("email")
+    user_id = data.get("_id")
 
-    if not email:
-        return jsonify({"error": "Target email is required"}), 400
+    if not user_id:
+        return jsonify({"error": "User ID (_id) is required"}), 400
 
     update_fields = {}
     for field in ["full_name", "email", "password"]:
@@ -79,12 +87,13 @@ def update_user(current_user):
     if not update_fields:
         return jsonify({"error": "No valid fields to update"}), 400
 
-    result = update_user_by_email(email, update_fields)
+    result = update_user_by_id(user_id, update_fields)
 
     if result.modified_count == 0:
         return jsonify({"message": "No changes made or user not found"}), 404
 
-    return jsonify({"message": f"User with email {email} updated", "modified": result.modified_count}), 200
+    return jsonify({"message": f"User with id {user_id} updated", "modified": result.modified_count}), 200
+
 
 @user_bp.route("/emails", methods=["GET"])
 @token_required

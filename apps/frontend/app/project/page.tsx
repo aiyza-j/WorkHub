@@ -1,9 +1,14 @@
 
 'use client'
 
+import dynamic from 'next/dynamic';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { withAuth } from '../components/withAuth'
-import ProjectTable from '../components/Project/ProjectTable'
+import Loading from '../components/loading'; 
+const ProjectTable = dynamic(() => import('../components/Project/ProjectTable'), {
+  loading: () => <Loading />,
+  ssr: false
+});
 import { Box, Typography, Container, useTheme } from '@mui/material';
 import { motion } from 'framer-motion';
 

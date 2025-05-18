@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import {
   Box,
   Typography,
@@ -19,10 +20,10 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Project, ServerResponse } from '../../types/Project';
 import { fetchProjects, createProject, updateProject, deleteProject } from '../../services/projectServices';
-import CreateModal from '../CreateModal';
-import DeleteModal from './DeleteModal';
-import MobileView from './MobileView';
-import TableView from './TableView';
+const CreateModal = dynamic(() => import('../CreateModal'));
+const DeleteModal = dynamic(() => import('./DeleteModal'));
+const MobileView = dynamic(() => import('./MobileView'));
+const TableView = dynamic(() => import('./TableView'))
 
 const ITEMS_PER_PAGE = 5;
 

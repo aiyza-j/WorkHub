@@ -73,6 +73,11 @@ const UserTable = ({
 
   const handleTextFieldChange = (field: 'full_name' | 'email', value: string) => {
     setEditValues((prev) => ({ ...prev, [field]: value }));
+
+    // Update selectedUser as well to ensure changes are synchronized
+    if (selectedUser) {
+      setSelectedUser(prev => prev ? { ...prev, [field]: value } : null);
+    }
   };
 
   return (
@@ -183,10 +188,7 @@ const UserTable = ({
                               variant="contained"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                if (selectedUser) {
-                                  setSelectedUser({ ...selectedUser, ...editValues });
-                                  handleSave();
-                                }
+                                handleSave();
                               }}
                               startIcon={<SaveIcon />}
                               size="small"

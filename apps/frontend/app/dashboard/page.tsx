@@ -1,9 +1,18 @@
 'use client'
 
-import dynamic from 'next/dynamic';
+import { Suspense, lazy } from 'react';
+import Loading from '../components/loading'; 
 
-const DashboardRedirect = dynamic(() => import('./DashboardRedirect'), { ssr: false });
+
+const DashboardRedirect = lazy(() => import('./DashboardRedirect'));
+
 
 export default function DashboardPage() {
-  return <DashboardRedirect />;
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Suspense fallback={<Loading />}>
+        <DashboardRedirect />
+      </Suspense>
+    </div>
+  );
 }

@@ -1,10 +1,15 @@
 'use client'
 
+import dynamic from 'next/dynamic';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { withAuth } from '../components/withAuth'
-import TaskTable from '../components/Task/TaskTable'
 import { Box, Typography, Container, useTheme } from '@mui/material';
 import { motion } from 'framer-motion';
+import Loading from '../components/loading';
+const TaskTable = dynamic(() => import('../components/Task/TaskTable'), {
+  loading: () => <Loading />,
+  ssr: false 
+});
 
 const TaskPage: React.FC = () => {
   const theme = useTheme();
