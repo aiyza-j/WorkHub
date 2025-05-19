@@ -264,7 +264,7 @@ const MobileTaskView = dynamic(() => import('./MobileTaskView'));
         <Typography variant="h4" gutterBottom
             sx={{
               fontWeight: 500,
-              color: theme.palette.primary.main,
+              color: theme.palette.mode === 'dark' ? 'white' : 'rgba(0,0,0,0.87)',
               mb: 4
             }}
           >
