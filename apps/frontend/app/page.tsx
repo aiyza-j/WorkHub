@@ -34,8 +34,7 @@ const itemVariants = {
 
 const buttonVariants = {
   hover: {
-    scale: 1.05,
-    boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)"
+    scale: 1.05
   },
   tap: {
     scale: 0.95

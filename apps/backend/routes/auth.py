@@ -22,7 +22,7 @@ def login():
     if not user or not bcrypt.checkpw(data['password'].encode(), user['password']):
         return jsonify({"error": "Invalid credentials"}), 401
     payload = {
-        "id": user['_id'],
+        'id': str(user['_id']),
         "email": user['email'],
         "password": user['role'],
         "full_name": user['full_name'],
