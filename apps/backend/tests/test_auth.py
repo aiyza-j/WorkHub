@@ -9,6 +9,9 @@ class TestAuth:
 
     def test_register_user_success(self, test_client, test_db, sample_user):
         """Test successful user registration."""
+        if not test_db:
+            pytest.skip("Database not available")
+
         response = test_client.post(
             "/api/auth/register",
             data=json.dumps(sample_user),
