@@ -1,12 +1,6 @@
 from dotenv import load_dotenv
 from pathlib import Path
 import os
-
-env_path = Path(__file__).resolve().parent.parent / ".env"
-load_dotenv(dotenv_path=env_path)
-
-print("lala MONGO_URI in conftest:", os.getenv("MONGO_URI"))
-
 import pytest
 import os
 import tempfile
