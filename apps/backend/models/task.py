@@ -3,6 +3,7 @@ from extensions import mongo
 import re
 from bson import ObjectId
 
+
 def create_task(title, description, project_id, assignee_email):
     task = {
         "title": title,
@@ -10,9 +11,10 @@ def create_task(title, description, project_id, assignee_email):
         "project_id": project_id,
         "assignee": assignee_email,
         "status": "open",
-        "created_at": datetime.datetime.utcnow()
+        "created_at": datetime.datetime.utcnow(),
     }
     mongo.db.tasks.insert_one(task)
+
 
 def get_tasks_by_project(project_id, search="", status="", page=1, per_page=10):
     query = {"project_id": project_id}
@@ -37,13 +39,20 @@ def get_tasks_by_project(project_id, search="", status="", page=1, per_page=10):
 
     return tasks, total
 
+
 def update_task_status(task_id, status):
     from bson import ObjectId
-    return mongo.db.tasks.update_one({"_id": ObjectId(task_id)}, {"$set": {"status": status}})
+
+    return mongo.db.tasks.update_one(
+        {"_id": ObjectId(task_id)}, {"$set": {"status": status}}
+    )
+
 
 def delete_task(task_id):
     from bson import ObjectId
+
     return mongo.db.tasks.delete_one({"_id": ObjectId(task_id)})
+
 
 def get_user_tasks(user_email, search="", status="", page=1, per_page=10):
     query = {"assignee": user_email}
@@ -60,9 +69,9 @@ def get_user_tasks(user_email, search="", status="", page=1, per_page=10):
     cursor = mongo.db.tasks.find(query).skip(skip_count).limit(per_page)
     tasks = list(cursor)
 
-    #mapping to simple numbers
+    # mapping to simple numbers
     project_ids = list({task["project_id"] for task in tasks})
-    project_id_map = {pid: str(i+1) for i, pid in enumerate(project_ids)}
+    project_id_map = {pid: str(i + 1) for i, pid in enumerate(project_ids)}
 
     for task in tasks:
         task["_id"] = str(task["_id"])
@@ -72,11 +81,16 @@ def get_user_tasks(user_email, search="", status="", page=1, per_page=10):
 
     return tasks, total
 
+
 def update_task(task_id, updates):
     allowed_fields = {"title", "description", "assignee", "status"}
-    update_fields = {key: value for key, value in updates.items() if key in allowed_fields}
+    update_fields = {
+        key: value for key, value in updates.items() if key in allowed_fields
+    }
 
     if not update_fields:
-        return None 
+        return None
 
-    return mongo.db.tasks.update_one({"_id": ObjectId(task_id)}, {"$set": update_fields})
+    return mongo.db.tasks.update_one(
+        {"_id": ObjectId(task_id)}, {"$set": update_fields}
+    )

@@ -6,6 +6,7 @@ from bson import ObjectId
 
 user_bp = Blueprint("users", __name__)
 
+
 @user_bp.route("/", methods=["GET"])
 @token_required
 @require_role("admin")
@@ -19,7 +20,7 @@ def get_users(current_user):
     if search:
         query["$or"] = [
             {"full_name": {"$regex": search, "$options": "i"}},
-            {"email": {"$regex": search, "$options": "i"}}
+            {"email": {"$regex": search, "$options": "i"}},
         ]
     if role_filter:
         query["role"] = role_filter
@@ -32,13 +33,7 @@ def get_users(current_user):
     for user in users:
         user["_id"] = str(user["_id"])
 
-    return jsonify({
-        "users": users,
-        "total": total,
-        "page": page,
-        "limit": limit
-    })
-
+    return jsonify({"users": users, "total": total, "page": page, "limit": limit})
 
 
 @user_bp.route("/delete", methods=["DELETE"])
@@ -48,7 +43,6 @@ def delete_user(current_user):
     data = request.json
     print(data)
     user_id = data.get("id")
-
 
     if not user_id:
         return jsonify({"error": "User ID is required"}), 400
@@ -66,7 +60,15 @@ def delete_user(current_user):
     if not result or result.deleted_count == 0:
         return jsonify({"error": "User not found or could not be deleted"}), 404
 
-    return jsonify({"message": f"User with id {user_id} deleted", "deleted": result.deleted_count}), 200
+    return (
+        jsonify(
+            {
+                "message": f"User with id {user_id} deleted",
+                "deleted": result.deleted_count,
+            }
+        ),
+        200,
+    )
 
 
 @user_bp.route("/update", methods=["PUT"])
@@ -92,7 +94,15 @@ def update_user(current_user):
     if result.modified_count == 0:
         return jsonify({"message": "No changes made or user not found"}), 404
 
-    return jsonify({"message": f"User with id {user_id} updated", "modified": result.modified_count}), 200
+    return (
+        jsonify(
+            {
+                "message": f"User with id {user_id} updated",
+                "modified": result.modified_count,
+            }
+        ),
+        200,
+    )
 
 
 @user_bp.route("/emails", methods=["GET"])
