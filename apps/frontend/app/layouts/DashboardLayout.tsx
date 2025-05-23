@@ -27,7 +27,6 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const { session, loading } = useSession();
 
 
-  // Set sidebar collapsed state on mobile devices
   useEffect(() => {
     if (isMobile) {
       setSidebarOpen(false);
