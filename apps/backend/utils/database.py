@@ -8,7 +8,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Global MongoDB client instance
+
 _client: Optional[MongoClient] = None
 _database: Optional[Database] = None
 
