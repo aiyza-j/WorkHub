@@ -30,7 +30,7 @@ def get_mongo_client() -> MongoClient:
         try:
             _client = MongoClient(mongo_uri)
             # Test the connection
-            _client.admin.command('ping')
+            _client.admin.command("ping")
             logger.info("Successfully connected to MongoDB")
         except Exception as e:
             logger.error(f"Failed to connect to MongoDB: {e}")
@@ -135,7 +135,7 @@ def health_check() -> bool:
     """
     try:
         client = get_mongo_client()
-        client.admin.command('ping')
+        client.admin.command("ping")
         return True
     except Exception as e:
         logger.error(f"Database health check failed: {e}")
