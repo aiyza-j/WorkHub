@@ -32,7 +32,7 @@ def test_db():
     client = MongoClient(os.getenv("MONGO_URI"))
     db = client.test_db
 
-    collections = ["users", "projects", "tasks"]
+    collections = ["test_users", "test_projects", "test_tasks"]
     for collection in collections:
         db[collection].delete_many({})
 
