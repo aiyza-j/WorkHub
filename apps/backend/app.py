@@ -31,6 +31,8 @@ app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
 app.url_map.strict_slashes = False
 
+print("MONGO_URI being used:", app.config.get("MONGO_URI"))
+
 mongo.init_app(app)
 
 # Register blueprints
