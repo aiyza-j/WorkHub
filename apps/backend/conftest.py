@@ -1,12 +1,16 @@
 import pytest
 import os
 import tempfile
+from dotenv import load_dotenv
+from pathlib import Path
 from app import app
 from utils.database import get_database
 from pymongo import MongoClient
 import jwt
 from datetime import datetime, timedelta
 
+env_path = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(dotenv_path=env_path)
 
 @pytest.fixture(scope="session")
 def test_client():
