@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 env_path = Path(__file__).resolve().parent.parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
+
 @pytest.fixture(scope="session")
 def test_client():
     """Create a test client for the Flask application."""
