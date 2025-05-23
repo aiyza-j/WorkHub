@@ -10,7 +10,6 @@ import {
   InputAdornment,
   Container,
   useTheme,
-  Fade,
   alpha
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
@@ -47,8 +46,12 @@ const AdminDashboard = () => {
       const data = await fetchUsers(page, ITEMS_PER_PAGE, searchTerm);
       setUsers(data.users);
       setTotalCount(data.totalCount);
-    } catch (err: any) {
+    } catch (err) {
+      if (err instanceof Error) {
       setError(err.message);
+      }else{
+        setError("An unknown error occurred.");
+      }
       setUsers([]);
       setTotalCount(0);
     } finally {
