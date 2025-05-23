@@ -13,14 +13,25 @@ load_dotenv()
 # Import your app and database utilities
 try:
     from app import app
-    from utils.database import get_database, get_collection, close_connection, DatabaseContext
+    from utils.database import (
+        get_database,
+        get_collection,
+        close_connection,
+        DatabaseContext,
+    )
 except ImportError:
     # Fallback imports if structure is different
     try:
         import sys
-        sys.path.append('.')
+
+        sys.path.append(".")
         from app import app
-        from database import get_database, get_collection, close_connection, DatabaseContext
+        from database import (
+            get_database,
+            get_collection,
+            close_connection,
+            DatabaseContext,
+        )
     except ImportError:
         print("Warning: Could not import app or database modules")
 
@@ -30,7 +41,9 @@ def test_client():
     """Create a test client for the Flask application."""
     app.config["TESTING"] = True
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "test-secret-key")
-    app.config["MONGO_URI"] = os.getenv("MONGO_URI", "mongodb://localhost:27017/test_db")
+    app.config["MONGO_URI"] = os.getenv(
+        "MONGO_URI", "mongodb://localhost:27017/test_db"
+    )
 
     with app.test_client() as testing_client:
         with app.app_context():
@@ -292,14 +305,15 @@ def pytest_sessionfinish(session, exitstatus):
 @pytest.fixture
 def mock_db():
     """Provide a mock database for tests that don't need real DB."""
+
     class MockCollection:
         def __init__(self):
             self.data = []
 
         def insert_one(self, doc):
-            doc['_id'] = ObjectId()
+            doc["_id"] = ObjectId()
             self.data.append(doc)
-            return type('obj', (object,), {'inserted_id': doc['_id']})
+            return type("obj", (object,), {"inserted_id": doc["_id"]})
 
         def find_one(self, query):
             for doc in self.data:
@@ -308,8 +322,11 @@ def mock_db():
             return None
 
         def delete_many(self, query):
-            self.data = [doc for doc in self.data
-                        if not all(doc.get(k) == v for k, v in query.items())]
+            self.data = [
+                doc
+                for doc in self.data
+                if not all(doc.get(k) == v for k, v in query.items())
+            ]
 
     class MockDB:
         def __init__(self):
@@ -326,6 +343,7 @@ def mock_db():
 @pytest.fixture
 def create_test_user(test_db):
     """Helper fixture to create a test user in the database."""
+
     def _create_user(user_data=None):
         if not test_db:
             return None
@@ -336,7 +354,7 @@ def create_test_user(test_db):
                 "email": "test@example.com",
                 "password": "hashedpassword",
                 "role": "user",
-                "created_at": datetime.utcnow()
+                "created_at": datetime.utcnow(),
             }
 
         try:
