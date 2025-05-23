@@ -13,7 +13,7 @@ app = FastAPI()
 
 @app.on_event("startup")
 async def startup():
-    client = AsyncIOMotorClient(settings.mongodb_uri)
+    client = AsyncIOMotorClient(settings.mongo_uri)
     db = client[settings.mongodb_db]
     await init_beanie(database=db, document_models=[User])
 

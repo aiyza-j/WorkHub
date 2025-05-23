@@ -14,7 +14,7 @@ def test_client():
 
     app.config["TESTING"] = True
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
-    app.config["MONGODB_URI"] = os.getenv("MONGODB_URI")
+    app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 
     with app.test_client() as testing_client:
         with app.app_context():
@@ -24,7 +24,7 @@ def test_client():
 @pytest.fixture(scope="function")
 def test_db():
     """Create a clean test database for each test."""
-    client = MongoClient(os.getenv("MONGODB_URI"))
+    client = MongoClient(os.getenv("MONGO_URI"))
     db = client.test_db
 
     collections = ["users", "projects", "tasks"]

@@ -4,7 +4,7 @@ from pydantic import Field
 
 class Settings(BaseSettings):
 
-    mongodb_uri: str = Field(..., alias="MONGODB_URI")
+    mongo_uri: str = Field(..., alias="MONGO_URI")
     mongodb_db: str = Field("workhub_db", env="MONGODB_DB")
     secret_key: str = Field(..., env="SECRET_KEY")
 
