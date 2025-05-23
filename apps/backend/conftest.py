@@ -4,13 +4,19 @@ import os
 import pytest
 import tempfile
 from app import app
-from utils.database import get_database, get_collection, close_connection, DatabaseContext
+from utils.database import (
+    get_database,
+    get_collection,
+    close_connection,
+    DatabaseContext,
+)
 from pymongo import MongoClient
 import jwt
 from datetime import datetime, timedelta
 
 # Load environment variables
 load_dotenv()
+
 
 @pytest.fixture(scope="session")
 def test_client():
@@ -51,9 +57,9 @@ def test_collections():
     test_db_name = "test_db_" + str(os.getpid())
 
     collections = {
-        'users': get_collection('users', test_db_name),
-        'projects': get_collection('projects', test_db_name),
-        'tasks': get_collection('tasks', test_db_name)
+        "users": get_collection("users", test_db_name),
+        "projects": get_collection("projects", test_db_name),
+        "tasks": get_collection("tasks", test_db_name),
     }
 
     # Clean up before test
@@ -157,34 +163,36 @@ def sample_task():
 def populated_db(test_collections, sample_user, sample_project, sample_task):
     """Create a database with sample data for integration tests."""
     # Insert sample user
-    user_result = test_collections['users'].insert_one({
-        **sample_user,
-        "created_at": datetime.utcnow(),
-        "updated_at": datetime.utcnow()
-    })
+    user_result = test_collections["users"].insert_one(
+        {
+            **sample_user,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+        }
+    )
 
     # Insert sample project
     project_data = {
         **sample_project,
         "created_at": datetime.utcnow(),
-        "updated_at": datetime.utcnow()
+        "updated_at": datetime.utcnow(),
     }
-    project_result = test_collections['projects'].insert_one(project_data)
+    project_result = test_collections["projects"].insert_one(project_data)
 
     # Insert sample task
     task_data = {
         **sample_task,
         "project_id": str(project_result.inserted_id),
         "created_at": datetime.utcnow(),
-        "updated_at": datetime.utcnow()
+        "updated_at": datetime.utcnow(),
     }
-    task_result = test_collections['tasks'].insert_one(task_data)
+    task_result = test_collections["tasks"].insert_one(task_data)
 
     return {
-        'user_id': str(user_result.inserted_id),
-        'project_id': str(project_result.inserted_id),
-        'task_id': str(task_result.inserted_id),
-        'collections': test_collections
+        "user_id": str(user_result.inserted_id),
+        "project_id": str(project_result.inserted_id),
+        "task_id": str(task_result.inserted_id),
+        "collections": test_collections,
     }
 
 
