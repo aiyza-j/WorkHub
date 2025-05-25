@@ -246,7 +246,7 @@ def admin_token(sample_admin):
     token = jwt.encode(payload, secret_key, algorithm="HS256")
     if isinstance(token, bytes):
         token = token.decode("utf-8")
-    return token 
+    return token
 
 
 @pytest.fixture
