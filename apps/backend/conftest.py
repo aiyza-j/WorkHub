@@ -22,6 +22,9 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv()
 
+# Global test database name - shared across all fixtures
+TEST_DB_NAME = "workHub"
+
 
 def get_test_mongo_uri():
     """Get the appropriate MongoDB URI for testing."""
@@ -35,45 +38,17 @@ def get_test_mongo_uri():
 
     logger.info(f"Using MongoDB URI: {mongo_uri[:20]}...")
 
-    # For testing, we'll use a test database suffix
-    if "?" in mongo_uri:
-        # If there are query parameters, insert the test db name before them
-        base_uri, params = mongo_uri.split("?", 1)
-        if base_uri.endswith("/"):
-            test_uri = f"{base_uri}test_db?{params}"
-        else:
-            # Replace the database name with test_db
-            parts = base_uri.split("/")
-            if len(parts) > 3:
-                parts[-1] = "test_db"
-            else:
-                parts.append("test_db")
-            test_uri = f"{'/'.join(parts)}?{params}"
-    else:
-        # No query parameters
-        if mongo_uri.endswith("/"):
-            test_uri = f"{mongo_uri}test_db"
-        else:
-            # Replace or add database name
-            parts = mongo_uri.split("/")
-            if len(parts) > 3:
-                parts[-1] = "test_db"
-            else:
-                parts.append("test_db")
-            test_uri = "/".join(parts)
-
-    return test_uri
+    return mongo_uri
 
 
 @pytest.fixture(scope="session")
 def test_client():
     """Create a test client for the Flask application."""
     app.config["TESTING"] = True
-    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "test-secret-key")
+    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
     # Set test MongoDB URI
     test_mongo_uri = get_test_mongo_uri()
-    app.config["MONGO_URI"] = test_mongo_uri
     os.environ["MONGO_URI"] = test_mongo_uri
 
     with app.test_client() as testing_client:
@@ -81,15 +56,10 @@ def test_client():
             yield testing_client
 
 
-@pytest.fixture(scope="function")
-def test_db():
-    """Create a clean test database for each test using the database utility."""
-    # Use a test-specific database name to avoid conflicts
-    test_db_name = (
-        f"test_db_{os.getpid()}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S_%f')}"
-    )
-
-    # Temporarily set the MONGO_URI for this test
+@pytest.fixture(scope="session")
+def test_db_session():
+    """Create a test database connection for the entire session."""
+    # Temporarily set the MONGO_URI for this test session
     original_mongo_uri = os.getenv("MONGO_URI")
     test_mongo_uri = get_test_mongo_uri()
     os.environ["MONGO_URI"] = test_mongo_uri
@@ -101,24 +71,11 @@ def test_db():
         logger.info("Successfully connected to MongoDB for testing")
 
         # Get database using your utility function
-        db = get_database(test_db_name)
-
-        # Clean up collections before test
-        collections = ["users", "projects", "tasks"]
-        for collection in collections:
-            try:
-                db[collection].delete_many({})
-            except Exception:
-                pass  # Collection might not exist yet
+        print("MONGO_URI used in test:", os.getenv("MONGO_URI"))
+        db = get_database(TEST_DB_NAME)
+        print("Database name in test:", db.name)
 
         yield db
-
-        # Clean up collections after test
-        for collection in collections:
-            try:
-                db[collection].delete_many({})
-            except Exception:
-                pass
 
         # Close the test client connection
         client.close()
@@ -136,26 +93,45 @@ def test_db():
 
 
 @pytest.fixture(scope="function")
-def test_collections():
-    """Provide access to test collections using the database utility."""
-    test_db_name = (
-        f"test_db_{os.getpid()}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S_%f')}"
-    )
+def test_db(test_db_session):
+    """Provide a clean test database for each test function."""
+    # Clean up collections before test
+    collections = ["users", "projects", "tasks"]
+    for collection in collections:
+        try:
+            result = test_db_session[collection].delete_many({})
+            logger.info(
+                f"Cleaned {result.deleted_count} documents from {collection} collection before test"
+            )
+        except Exception as e:
+            logger.warning(f"Failed to clean {collection} collection before test: {e}")
 
+    yield test_db_session
+
+    # Clean up collections after test
+    for collection in collections:
+        try:
+            result = test_db_session[collection].delete_many({})
+            logger.info(
+                f"Cleaned {result.deleted_count} documents from {collection} collection after test"
+            )
+        except Exception as e:
+            logger.warning(f"Failed to clean {collection} collection after test: {e}")
+
+
+@pytest.fixture(scope="function")
+def test_collections(test_db_session):
+    """Provide access to test collections using the database utility."""
     # Temporarily set the MONGO_URI for this test
     original_mongo_uri = os.getenv("MONGO_URI")
     test_mongo_uri = get_test_mongo_uri()
     os.environ["MONGO_URI"] = test_mongo_uri
 
     try:
-        # Test connection first
-        client = MongoClient(test_mongo_uri)
-        client.admin.command("ping")
-
         collections = {
-            "users": get_collection("users", test_db_name),
-            "projects": get_collection("projects", test_db_name),
-            "tasks": get_collection("tasks", test_db_name),
+            "users": get_collection("users", TEST_DB_NAME),
+            "projects": get_collection("projects", TEST_DB_NAME),
+            "tasks": get_collection("tasks", TEST_DB_NAME),
         }
 
         # Clean up before test
@@ -174,12 +150,6 @@ def test_collections():
             except Exception:
                 pass
 
-        client.close()
-
-    except Exception as e:
-        logger.error(f"Failed to connect to test database: {e}")
-        pytest.skip(f"Database connection failed: {e}")
-
     finally:
         # Restore original MONGO_URI
         if original_mongo_uri:
@@ -189,23 +159,15 @@ def test_collections():
 
 
 @pytest.fixture(scope="function")
-def db_context():
+def db_context(test_db_session):
     """Provide a database context manager for tests."""
-    test_db_name = (
-        f"test_db_{os.getpid()}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S_%f')}"
-    )
-
     # Temporarily set the MONGO_URI for this test
     original_mongo_uri = os.getenv("MONGO_URI")
     test_mongo_uri = get_test_mongo_uri()
     os.environ["MONGO_URI"] = test_mongo_uri
 
     try:
-        # Test connection first
-        client = MongoClient(test_mongo_uri)
-        client.admin.command("ping")
-
-        with DatabaseContext(test_db_name) as db:
+        with DatabaseContext(TEST_DB_NAME) as db:
             # Clean up before test
             collections = ["users", "projects", "tasks"]
             for collection in collections:
@@ -222,12 +184,6 @@ def db_context():
                     db[collection].delete_many({})
                 except Exception:
                     pass
-
-        client.close()
-
-    except Exception as e:
-        logger.error(f"Failed to connect to test database: {e}")
-        pytest.skip(f"Database connection failed: {e}")
 
     finally:
         # Restore original MONGO_URI
@@ -252,9 +208,9 @@ def sample_user():
 def sample_admin():
     """Create a sample admin user for testing."""
     return {
-        "full_name": "adminname",
+        "_id": "test_admin_id",
         "email": "admin@example.com",
-        "password": "adminpassword123",
+        "full_name": "Test Admin",
         "role": "admin",
     }
 
@@ -268,7 +224,7 @@ def auth_token(sample_user):
         "role": sample_user["role"],
         "exp": datetime.utcnow() + timedelta(days=1),
     }
-    secret_key = os.getenv("SECRET_KEY", "test-secret-key")
+    secret_key = os.getenv("SECRET_KEY")
     return jwt.encode(payload, secret_key, algorithm="HS256")
 
 
@@ -276,12 +232,14 @@ def auth_token(sample_user):
 def admin_token(sample_admin):
     """Generate a JWT token for testing admin endpoints."""
     payload = {
-        "user_id": "test_admin_id",
+        "id": str(sample_admin["_id"]),
         "email": sample_admin["email"],
+        "full_name": sample_admin["full_name"],
         "role": sample_admin["role"],
-        "exp": datetime.utcnow() + timedelta(days=1),
+        "exp": datetime.utcnow() + timedelta(hours=2),
     }
-    secret_key = os.getenv("SECRET_KEY", "test-secret-key")
+    secret_key = os.getenv("SECRET_KEY")
+    logger.info(f"Using secret key: {secret_key[:5]}...")  # NEVER log full secrets!
     return jwt.encode(payload, secret_key, algorithm="HS256")
 
 
@@ -356,9 +314,6 @@ def pytest_configure(config):
 
 def pytest_sessionstart(session):
     """Actions to perform at the start of the test session."""
-    # Set test environment variables
-    if not os.getenv("SECRET_KEY"):
-        os.environ["SECRET_KEY"] = "test-secret-key"
 
     # Test MongoDB connection
     try:
@@ -374,6 +329,16 @@ def pytest_sessionstart(session):
 
 def pytest_sessionfinish(session, exitstatus):
     """Actions to perform at the end of the test session."""
+    # Clean up test database
+    try:
+        test_mongo_uri = get_test_mongo_uri()
+        client = MongoClient(test_mongo_uri)
+        client.drop_database(TEST_DB_NAME)
+        client.close()
+        logger.info(f"Cleaned up test database: {TEST_DB_NAME}")
+    except Exception as e:
+        logger.warning(f"Failed to clean up test database: {e}")
+
     # Close database connections
     try:
         close_connection()

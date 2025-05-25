@@ -3,8 +3,17 @@ from utils.decorators import token_required, require_role
 from models.user import get_all_users, delete_user_by_id, update_user_by_id
 from extensions import mongo
 from bson import ObjectId
+from bson.errors import InvalidId
 
 user_bp = Blueprint("users", __name__)
+
+
+def is_valid_objectid(id_str):
+    try:
+        ObjectId(id_str)
+        return True
+    except (InvalidId, TypeError):
+        return False
 
 
 @user_bp.route("/", methods=["GET"])
@@ -44,6 +53,10 @@ def delete_user(current_user):
     print(data)
     user_id = data.get("id")
 
+    if not user_id or not is_valid_objectid(user_id):
+        return jsonify({"error": "Invalid User ID"}), 400
+
+    user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
     if not user_id:
         return jsonify({"error": "User ID is required"}), 400
 

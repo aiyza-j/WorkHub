@@ -21,7 +21,7 @@ def new_task(current_user):
     create_task(
         data["title"], data["description"], data["project_id"], data["assignee"]
     )
-    return jsonify({"message": "Task created"})
+    return jsonify({"message": "Task created"}), 201
 
 
 @task_bp.route("/project/<project_id>", methods=["GET"])

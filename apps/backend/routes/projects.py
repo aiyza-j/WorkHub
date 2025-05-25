@@ -24,7 +24,7 @@ def new_project(current_user):
         return jsonify({"error": "Name and description are required"}), 400
 
     create_project(name, description, current_user["email"])
-    return jsonify({"message": "Project created"})
+    return jsonify({"message": "Project created"}), 201
 
 
 @project_bp.route("/", methods=["GET"])

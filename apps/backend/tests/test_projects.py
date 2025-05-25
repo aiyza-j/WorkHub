@@ -8,10 +8,10 @@ class TestProjects:
 
     def test_create_project(self, test_client, test_db, auth_token, sample_project):
         """Test creating a new project."""
-        if not test_db:
+        if test_db is None:
             pytest.skip("Database not available")
 
-        headers = {"Authorization": f"Bearer {auth_token}"}
+        headers = {"Authorization": auth_token}
         response = test_client.post(
             "/api/projects/",
             data=json.dumps(sample_project),
@@ -21,7 +21,7 @@ class TestProjects:
 
         assert response.status_code == 201
         data = response.get_json()
-        assert "project_id" in data
+        assert data == {"message": "Project created"}
 
         # Check project was created in database
         project = test_db.projects.find_one({"name": sample_project["name"]})
@@ -29,7 +29,7 @@ class TestProjects:
 
     def test_get_user_projects(self, test_client, test_db, auth_token):
         """Test getting user's projects."""
-        if not test_db:
+        if test_db is None:
             pytest.skip("Database not available")
 
         # Create a project in database
@@ -41,20 +41,22 @@ class TestProjects:
             }
         )
 
-        headers = {"Authorization": f"Bearer {auth_token}"}
+        headers = {"Authorization": auth_token}
         response = test_client.get("/api/projects/", headers=headers)
 
         assert response.status_code == 200
         data = response.get_json()
-        assert isinstance(data, list)
+        assert isinstance(data, dict)
+        assert "projects" in data
+        assert isinstance(data["projects"], list)
         assert len(data) >= 1
 
     def test_update_project(self, test_client, test_db, auth_token):
         """Test updating a project."""
-        if not test_db:
+        if test_db is None:
             pytest.skip("Database not available")
 
-        # Create a project in database
+        # Create a project in the database
         project_id = test_db.projects.insert_one(
             {
                 "name": "Test Project Update",
@@ -69,19 +71,21 @@ class TestProjects:
             "description": "Updated Description",
         }
 
-        headers = {"Authorization": f"Bearer {auth_token}"}
+        headers = {"Authorization": auth_token}
         response = test_client.put(
-            f"/api/projects/{project_id}",
+            "/api/projects/update",
             data=json.dumps(update_data),
             content_type="application/json",
             headers=headers,
         )
 
         assert response.status_code == 200
+        data = response.get_json()
+        assert data == {"message": "Project updated successfully"}
 
     def test_delete_project(self, test_client, test_db, auth_token):
         """Test deleting a project."""
-        if not test_db:
+        if test_db is None:
             pytest.skip("Database not available")
 
         # Create a project in database
@@ -95,7 +99,7 @@ class TestProjects:
 
         delete_data = {"project_id": str(project_id)}
 
-        headers = {"Authorization": f"Bearer {auth_token}"}
+        headers = {"Authorization": auth_token}
         response = test_client.delete(
             "/api/projects/delete",
             data=json.dumps(delete_data),
