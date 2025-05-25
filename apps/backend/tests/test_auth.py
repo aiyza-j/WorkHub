@@ -30,6 +30,9 @@ class TestAuth:
 
     def test_register_duplicate_email(self, test_client, test_db, sample_user):
         """Test registration with duplicate email."""
+        if not test_db:
+            pytest.skip("Database not available")
+
         # First registration
         test_client.post(
             "/api/auth/register",
@@ -50,6 +53,9 @@ class TestAuth:
 
     def test_login_success(self, test_client, test_db, sample_user):
         """Test successful user login."""
+        if not test_db:
+            pytest.skip("Database not available")
+
         # Register user first
         test_client.post(
             "/api/auth/register",

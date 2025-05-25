@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from pymongo.database import Database
 from typing import Optional
 import logging
+import time
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -28,12 +29,32 @@ def get_mongo_client() -> MongoClient:
             raise ValueError("MONGO_URI environment variable is not set")
 
         try:
-            _client = MongoClient(mongo_uri)
-            # Test the connection
-            _client.admin.command("ping")
-            logger.info("Successfully connected to MongoDB")
+            # Create client with connection timeout settings for better reliability
+            _client = MongoClient(
+                mongo_uri,
+                serverSelectionTimeoutMS=10000,  # 10 seconds
+                connectTimeoutMS=10000,  # 10 seconds
+                socketTimeoutMS=10000,  # 10 seconds
+                maxPoolSize=10,
+                retryWrites=True
+            )
+
+            # Test the connection with retries
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    _client.admin.command("ping")
+                    logger.info("Successfully connected to MongoDB")
+                    break
+                except Exception as e:
+                    if attempt == max_retries - 1:
+                        raise e
+                    logger.warning(f"Connection attempt {attempt + 1} failed, retrying...")
+                    time.sleep(2)
+
         except Exception as e:
             logger.error(f"Failed to connect to MongoDB: {e}")
+            _client = None
             raise
 
     return _client
@@ -62,13 +83,20 @@ def get_database(db_name: Optional[str] = None) -> Database:
 
         # Try to extract database name from URI
         if "/" in mongo_uri:
-            db_name = mongo_uri.split("/")[-1].split("?")[0]
-            if db_name and db_name != "":
-                _database = client[db_name]
+            # Split by '/' and get the last part, then remove query parameters
+            uri_parts = mongo_uri.split("/")
+            if len(uri_parts) > 3:  # mongodb://host:port/dbname
+                db_name = uri_parts[-1].split("?")[0]
+                if db_name and db_name != "":
+                    _database = client[db_name]
+                else:
+                    _database = client["app_db"]  # default database name
             else:
                 _database = client["app_db"]  # default database name
         else:
             _database = client["app_db"]  # default database name
+
+        logger.info(f"Using database: {_database.name}")
 
     return _database
 
@@ -106,18 +134,47 @@ def init_database():
 
         # Create indexes for better performance
         users_collection = db.users
-        users_collection.create_index("email", unique=True)
-        users_collection.create_index("created_at")
+        try:
+            users_collection.create_index("email", unique=True)
+        except Exception as e:
+            logger.warning(f"Index creation for users.email failed (may already exist): {e}")
+
+        try:
+            users_collection.create_index("created_at")
+        except Exception as e:
+            logger.warning(f"Index creation for users.created_at failed: {e}")
 
         projects_collection = db.projects
-        projects_collection.create_index("owner_email")
-        projects_collection.create_index("created_at")
+        try:
+            projects_collection.create_index("owner_email")
+        except Exception as e:
+            logger.warning(f"Index creation for projects.owner_email failed: {e}")
+
+        try:
+            projects_collection.create_index("created_at")
+        except Exception as e:
+            logger.warning(f"Index creation for projects.created_at failed: {e}")
 
         tasks_collection = db.tasks
-        tasks_collection.create_index("project_id")
-        tasks_collection.create_index("assignee")
-        tasks_collection.create_index("status")
-        tasks_collection.create_index("created_at")
+        try:
+            tasks_collection.create_index("project_id")
+        except Exception as e:
+            logger.warning(f"Index creation for tasks.project_id failed: {e}")
+
+        try:
+            tasks_collection.create_index("assignee")
+        except Exception as e:
+            logger.warning(f"Index creation for tasks.assignee failed: {e}")
+
+        try:
+            tasks_collection.create_index("status")
+        except Exception as e:
+            logger.warning(f"Index creation for tasks.status failed: {e}")
+
+        try:
+            tasks_collection.create_index("created_at")
+        except Exception as e:
+            logger.warning(f"Index creation for tasks.created_at failed: {e}")
 
         logger.info("Database initialized successfully")
 
