@@ -29,7 +29,9 @@ def get_test_mongo_uri():
     mongo_uri = os.getenv("MONGO_URI")
 
     if not mongo_uri:
-        raise ValueError("MONGO_URI environment variable is not set. Please set it in GitHub secrets or your .env file")
+        raise ValueError(
+            "MONGO_URI environment variable is not set. Please set it in GitHub secrets or your .env file"
+        )
 
     logger.info(f"Using MongoDB URI: {mongo_uri[:20]}...")
 
@@ -83,7 +85,9 @@ def test_client():
 def test_db():
     """Create a clean test database for each test using the database utility."""
     # Use a test-specific database name to avoid conflicts
-    test_db_name = f"test_db_{os.getpid()}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S_%f')}"
+    test_db_name = (
+        f"test_db_{os.getpid()}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S_%f')}"
+    )
 
     # Temporarily set the MONGO_URI for this test
     original_mongo_uri = os.getenv("MONGO_URI")
@@ -134,7 +138,9 @@ def test_db():
 @pytest.fixture(scope="function")
 def test_collections():
     """Provide access to test collections using the database utility."""
-    test_db_name = f"test_db_{os.getpid()}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S_%f')}"
+    test_db_name = (
+        f"test_db_{os.getpid()}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S_%f')}"
+    )
 
     # Temporarily set the MONGO_URI for this test
     original_mongo_uri = os.getenv("MONGO_URI")
@@ -185,7 +191,9 @@ def test_collections():
 @pytest.fixture(scope="function")
 def db_context():
     """Provide a database context manager for tests."""
-    test_db_name = f"test_db_{os.getpid()}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S_%f')}"
+    test_db_name = (
+        f"test_db_{os.getpid()}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S_%f')}"
+    )
 
     # Temporarily set the MONGO_URI for this test
     original_mongo_uri = os.getenv("MONGO_URI")

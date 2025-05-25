@@ -36,7 +36,7 @@ def get_mongo_client() -> MongoClient:
                 connectTimeoutMS=10000,  # 10 seconds
                 socketTimeoutMS=10000,  # 10 seconds
                 maxPoolSize=10,
-                retryWrites=True
+                retryWrites=True,
             )
 
             # Test the connection with retries
@@ -49,7 +49,9 @@ def get_mongo_client() -> MongoClient:
                 except Exception as e:
                     if attempt == max_retries - 1:
                         raise e
-                    logger.warning(f"Connection attempt {attempt + 1} failed, retrying...")
+                    logger.warning(
+                        f"Connection attempt {attempt + 1} failed, retrying..."
+                    )
                     time.sleep(2)
 
         except Exception as e:
@@ -137,7 +139,9 @@ def init_database():
         try:
             users_collection.create_index("email", unique=True)
         except Exception as e:
-            logger.warning(f"Index creation for users.email failed (may already exist): {e}")
+            logger.warning(
+                f"Index creation for users.email failed (may already exist): {e}"
+            )
 
         try:
             users_collection.create_index("created_at")
