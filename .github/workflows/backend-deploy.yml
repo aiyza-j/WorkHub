@@ -46,11 +46,15 @@ jobs:
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           black --check .
 
-      - name: Run tests
+      - name: Install MongoDB Memory Server
+        run: |
+          pip install pymongo-inmemory
+
+      - name: Run tests with in-memory MongoDB
         run: |
           pytest tests/ -v --cov=. --cov-report=xml
         env:
-          MONGO_URI: ${{ secrets.MONGO_URI }}
+          USE_MEMORY_DB: true
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           FLASK_ENV: testing
 
