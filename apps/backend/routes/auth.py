@@ -42,7 +42,6 @@ def login():
     payload = {
         "id": str(user["_id"]),
         "email": user["email"],
-        "password": user["password"],
         "full_name": user["full_name"],
         "role": user["role"],
         "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=2),
