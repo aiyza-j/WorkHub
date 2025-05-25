@@ -9,7 +9,7 @@ class TestAuth:
 
     def test_register_user_success(self, test_client, test_db, sample_user):
         """Test successful user registration."""
-        if not test_db:
+        if test_db is None:
             pytest.skip("Database not available")
 
         response = test_client.post(
