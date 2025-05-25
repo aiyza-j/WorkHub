@@ -159,6 +159,7 @@ class TestAdminUserManagement:
 
         assert response.status_code == 404
 
+
     def test_admin_fetch_user_emails(self, test_client, test_db, admin_token):
         """Test admin fetching all user emails."""
         # Create test users

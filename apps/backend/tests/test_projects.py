@@ -66,7 +66,7 @@ class TestProjects:
         ).inserted_id
 
         update_data = {
-            "project_id": str(project_id),
+            "_id": str(project_id),
             "name": "Updated Project",
             "description": "Updated Description",
         }

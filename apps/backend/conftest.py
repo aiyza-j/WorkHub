@@ -225,7 +225,10 @@ def auth_token(sample_user):
         "exp": datetime.utcnow() + timedelta(days=1),
     }
     secret_key = os.getenv("SECRET_KEY")
-    return jwt.encode(payload, secret_key, algorithm="HS256")
+    token = jwt.encode(payload, secret_key, algorithm="HS256")
+    if isinstance(token, bytes):
+        token = token.decode("utf-8")
+    return token
 
 
 @pytest.fixture
@@ -239,8 +242,11 @@ def admin_token(sample_admin):
         "exp": datetime.utcnow() + timedelta(hours=2),
     }
     secret_key = os.getenv("SECRET_KEY")
-    logger.info(f"Using secret key: {secret_key[:5]}...")  # NEVER log full secrets!
-    return jwt.encode(payload, secret_key, algorithm="HS256")
+    logger.info(f"Using secret key: {secret_key[:5]}...")
+    token = jwt.encode(payload, secret_key, algorithm="HS256")
+    if isinstance(token, bytes):
+        token = token.decode("utf-8")
+    return token 
 
 
 @pytest.fixture
