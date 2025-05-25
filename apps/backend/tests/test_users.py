@@ -89,7 +89,7 @@ class TestAdminUserManagement:
 
         # Update data matching frontend format
         update_data = {
-            "_id": ObjectId(str(user_id)),
+            "user_id": str(user_id),
             "email": "updated@example.com",
             "full_name": "Updated Name",
         }
