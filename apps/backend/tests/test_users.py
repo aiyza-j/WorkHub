@@ -74,6 +74,36 @@ class TestAdminUserManagement:
         found_john = any(user["full_name"] == "John Doe" for user in users)
         assert found_john
 
+    def test_admin_update_user_success(self, test_client, test_db, admin_token):
+        """Test admin successfully updating a user."""
+        # Create a test user
+        user_id = ObjectId()
+        test_db.users.insert_one(
+            {
+                "_id": user_id,
+                "full_name": "Original Name",
+                "email": "original@example.com",
+                "role": "user",
+            }
+        )
+
+        # Update data matching frontend format
+        update_data = {
+            "user_id": str(user_id),
+            "email": "updated@example.com",
+            "full_name": "Updated Name",
+        }
+
+        headers = {"Authorization": admin_token}
+        response = test_client.put(
+            "/api/users/update",
+            data=json.dumps(update_data),
+            content_type="application/json",
+            headers=headers,
+        )
+
+        assert response.status_code == 200
+
     def test_admin_delete_user_success(self, test_client, test_db, admin_token):
         """Test admin successfully deleting a user."""
         # Create a test user
