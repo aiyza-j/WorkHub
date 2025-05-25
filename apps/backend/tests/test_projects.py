@@ -1,5 +1,6 @@
 import pytest
 import json
+from bson import ObjectId
 
 
 @pytest.mark.api
@@ -66,7 +67,7 @@ class TestProjects:
         ).inserted_id
 
         update_data = {
-            "_id": str(project_id),
+            "_id": ObjectId(str(project_id)),
             "name": "Updated Project",
             "description": "Updated Description",
         }
