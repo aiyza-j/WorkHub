@@ -5,7 +5,7 @@ from unittest.mock import patch, MagicMock
 
 @pytest.mark.auth
 class TestAuth:
-    """Test cases for authentication functionality."""
+    """Test casses for authentication functionality."""
 
     def test_register_user_success(self, test_client, test_db, sample_user):
         """Test successful user registration."""
