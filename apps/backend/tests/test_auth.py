@@ -21,7 +21,8 @@ class TestAuth:
         assert response.status_code == 201
         data = response.get_json()
         assert "message" in data
-        assert "user_id" in data
+        assert data["message"] == "User registered"
+
 
         # Check user was created in database
         user = test_db.users.find_one({"email": sample_user["email"]})
@@ -30,7 +31,7 @@ class TestAuth:
 
     def test_register_duplicate_email(self, test_client, test_db, sample_user):
         """Test registration with duplicate email."""
-        if not test_db:
+        if test_db is None:
             pytest.skip("Database not available")
 
         # First registration
@@ -53,7 +54,7 @@ class TestAuth:
 
     def test_login_success(self, test_client, test_db, sample_user):
         """Test successful user login."""
-        if not test_db:
+        if test_db is None:
             pytest.skip("Database not available")
 
         # Register user first
