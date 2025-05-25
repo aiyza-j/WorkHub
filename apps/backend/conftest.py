@@ -26,7 +26,7 @@ load_dotenv()
 def get_test_mongo_uri():
     """Get the appropriate MongoDB URI for testing."""
     # Always use the MONGO_URI from environment (GitHub secrets or local .env)
-    mongo_uri = os.getenv("MONGO_URI")
+    mongo_uri = os.getenv("MONGO_URI") + '&ssl_cert_reqs=CERT_NONE'
 
     if not mongo_uri:
         raise ValueError(
