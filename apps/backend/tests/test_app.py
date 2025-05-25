@@ -3,7 +3,7 @@ from app import app
 
 
 class TestApp:
-    """Test cases for main application functionality."""
+    """Test caswes for main application functionality."""
 
     def test_app_creation(self, test_client):
         """Test that the Flask app is created successfully."""
