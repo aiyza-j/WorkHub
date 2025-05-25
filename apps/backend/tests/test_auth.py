@@ -23,7 +23,6 @@ class TestAuth:
         assert "message" in data
         assert data["message"] == "User registered"
 
-
         # Check user was created in database
         user = test_db.users.find_one({"email": sample_user["email"]})
         assert user is not None
