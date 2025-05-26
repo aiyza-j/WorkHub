@@ -1,62 +1,31 @@
-FROM node:18-alpine AS base
+FROM node:18-alpine
 
-# Install pnpm globally
-RUN npm install -g pnpm
+# Create non-root user first
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
 
-# ---------- Dependencies Layer ----------
-FROM base AS deps
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Set working directory and change ownership
 WORKDIR /app
+RUN chown nextjs:nodejs /app
 
-# Copy the whole monorepo so workspace layout is preserved
-COPY . .
-
-# Install all dependencies for all workspaces
-RUN pnpm install --frozen-lockfile
-
-# ---------- Build Layer ----------
-FROM base AS builder
-WORKDIR /app
-
-# Copy everything again (if caching doesn't already preserve)
-COPY . .
-
-# Reuse deps from the previous stage
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/frontend/node_modules ./apps/frontend/node_modules
-COPY --from=deps /app/packages ./packages
-
-# Set env vars
-ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-
-# Write config if needed
-WORKDIR /app/apps/frontend
-RUN echo 'module.exports = { output: "standalone" }' > next.config.js
-
-# Build the frontend
-RUN pnpm --filter frontend... build
-
-# ---------- Final Runtime Layer ----------
-FROM node:18-alpine AS runner
-WORKDIR /app
-
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
-
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
-
-WORKDIR /app/apps/frontend
-
-# Copy the standalone server
-COPY --from=builder /app/apps/frontend/.next/standalone ./
-COPY --from=builder /app/apps/frontend/.next/static ./.next/static
-COPY --from=builder /app/apps/frontend/public ./public
-
+# Switch to non-root user before installing
 USER nextjs
 
-EXPOSE 3000
-ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
+# Copy frontend package files with correct ownership
+COPY --chown=nextjs:nodejs apps/frontend/package.json ./
+COPY --chown=nextjs:nodejs apps/frontend/pnpm-lock.yaml* ./
 
+# Install dependencies (creates node_modules with correct ownership)
+RUN pnpm install --no-frozen-lockfile
+
+# Copy frontend source code with correct ownership
+COPY --chown=nextjs:nodejs apps/frontend ./
+
+# Expose port
+EXPOSE 3000
+
+# Start dev server
 CMD ["pnpm", "dev"]

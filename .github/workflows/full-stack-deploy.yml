@@ -6,17 +6,58 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-frontend:
+  build-frontend:
     uses: ./.github/workflows/frontend-deploy.yml
     secrets: inherit
 
-  deploy-backend:
+  build-backend:
     uses: ./.github/workflows/backend-deploy.yml
     secrets: inherit
 
-  integration-tests:
-    needs: [deploy-frontend, deploy-backend]
+  deploy:
+    needs: [build-frontend, build-backend]
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy with Docker Compose
+        run: |
+          # Create environment file
+          cat << EOF > .env
+          MONGO_URI=${{ secrets.MONGO_URI }}
+          SECRET_KEY=${{ secrets.SECRET_KEY }}
+          NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+          EOF
+
+          # Pull latest images
+          docker-compose pull
+
+          # Start services
+          docker-compose up -d
+
+          # Wait for services to be ready
+          sleep 30
+
+          # Health check
+          docker-compose ps
+
+  integration-tests:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout code
@@ -27,9 +68,6 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Wait for deployments to be ready
-        run: sleep 60
-
       - name: Install Playwright
         run: |
           npm install -D @playwright/test
@@ -38,8 +76,8 @@ jobs:
       - name: Run E2E tests
         run: npx playwright test
         env:
-          BASE_URL: ${{ secrets.FRONTEND_URL }}
-          API_URL: ${{ secrets.BACKEND_URL }}
+          BASE_URL: http://localhost:3000
+          API_URL: http://localhost:5000
 
       - name: Upload test results
         uses: actions/upload-artifact@v3

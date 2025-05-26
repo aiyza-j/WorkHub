@@ -50,7 +50,7 @@ const AdminDashboard = () => {
       if (err instanceof Error) {
       setError(err.message);
       }else{
-        setError("An unknown error occurred.");
+        setError("An unxknown error occurred.");
       }
       setUsers([]);
       setTotalCount(0);
