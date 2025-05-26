@@ -2,33 +2,31 @@ FROM node:18-alpine AS base
 
 RUN npm install -g pnpm
 
-
 FROM base AS deps
 WORKDIR /app
 
-
 COPY package.json pnpm-lock.yaml* ./
 RUN pnpm install --frozen-lockfile
-
 
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
+RUN echo 'module.exports = { output: "standalone" }' > next.config.js
 
 RUN pnpm build
-
 
 FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
+# Create system user
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
