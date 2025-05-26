@@ -233,7 +233,7 @@ def auth_token(sample_user):
 
 @pytest.fixture
 def admin_token(sample_admin):
-    """Generate a JWyT token for testing admin endpoints."""
+    """Generate a JWT token for testing admin endpoints."""
     payload = {
         "id": str(sample_admin["_id"]),
         "email": sample_admin["email"],
