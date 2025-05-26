@@ -9,10 +9,16 @@ jobs:
   build-frontend:
     uses: ./.github/workflows/frontend-deploy.yml
     secrets: inherit
+    permissions:
+      contents: read
+      packages: write
 
   build-backend:
     uses: ./.github/workflows/backend-deploy.yml
     secrets: inherit
+    permissions:
+      contents: read
+      packages: write
 
   deploy:
     needs: [build-frontend, build-backend]
