@@ -30,7 +30,7 @@ export const useSession = (): UseSessionReturn => {
           setSession(decoded);
         } else {
           localStorage.removeItem('token');
-          alert('Invalid session. Please log in again.');
+          alert('Invalid session. Please  log in again.');
           router.push('/login');
 
         }
