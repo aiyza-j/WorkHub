@@ -78,4 +78,4 @@ jobs:
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
             -d '{}' \
-            "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys"
+            "https://api.render.com/v1/services/${{ secrets.BACKEND_RENDER_SERVICE_ID }}/deploys"
