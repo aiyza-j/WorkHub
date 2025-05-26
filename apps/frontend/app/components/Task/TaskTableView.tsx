@@ -14,7 +14,8 @@ import {
   MenuItem,
   TextField,
   Select,
-  SelectChangeEvent
+  SelectChangeEvent,
+  Theme
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -29,7 +30,7 @@ interface TaskTableViewProps {
   error: string | null;
   editingTaskId: string | null;
   selectedTask: Task | null;
-  theme: any;
+  theme: Theme;
   projectId: string | null;
   userEmails: string[];
   loadingEmails?: boolean;
@@ -40,7 +41,7 @@ interface TaskTableViewProps {
   handleOpenDeleteModal: (task: Task) => void;
   handleStatusChange: (event: SelectChangeEvent) => void;
   handleTaskChange: (field: string, value: string) => void;
-  getStatusColor: (status: string) => any;
+  getStatusColor: (status: string) => void;
   setSelectedTask: (task: Task) => void;
 }
 

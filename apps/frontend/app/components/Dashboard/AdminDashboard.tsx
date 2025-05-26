@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Box,
   Typography,
@@ -38,7 +38,7 @@ const AdminDashboard = () => {
 
   const ITEMS_PER_PAGE = 5;
 
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -57,11 +57,11 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, searchTerm]);
 
   useEffect(() => {
     loadUsers();
-  }, [searchTerm, page, loadUsers]);
+  }, [loadUsers]);
 
   useEffect(() => {
     setPage(1);

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import {
   Box,
@@ -42,7 +42,7 @@ export default function ProjectTable() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const loadProjects = async () => {
+  const loadProjects = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -62,11 +62,11 @@ export default function ProjectTable() {
     finally {
           setLoading(false);
         }
-      };
+      },[searchTerm, page,])
 
   useEffect(() => {
     loadProjects();
-  }, [searchTerm, page, loadProjects]);
+  }, [loadProjects]);
 
   useEffect(() => {
     setPage(1);

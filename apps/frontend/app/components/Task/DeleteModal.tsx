@@ -7,6 +7,7 @@ import {
   Fade,
   Backdrop,
   IconButton,
+  Theme,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { motion } from 'framer-motion';
@@ -18,7 +19,7 @@ interface DeleteModalProps {
   onClose: () => void;
   task: Task | null;
   onDelete: () => void;
-  theme: any;
+  theme: Theme;
 }
 
 const DeleteModal: React.FC<DeleteModalProps> = ({

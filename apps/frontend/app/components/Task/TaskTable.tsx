@@ -75,8 +75,12 @@ const MobileTaskView = dynamic(() => import('./MobileTaskView'));
         );
         setTasks(data.tasks);
         setTotalCount(data.total);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+            setError(err.message);
+          } else {
+            setError('An unknown error occurred');
+        };
         setTasks([]);
         setTotalCount(0);
       } finally {

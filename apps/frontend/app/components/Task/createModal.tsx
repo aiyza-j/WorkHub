@@ -11,7 +11,8 @@ import {
   alpha,
   CircularProgress,
   MenuItem,
-  Select
+  Select,
+  Theme
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { motion } from 'framer-motion';
@@ -24,7 +25,7 @@ interface CreateModalProps {
   task: Task | null;
   onChange: (updatedTask: Task) => void;
   onSubmit: () => void;
-  theme: any;
+  theme: Theme;
   userEmails: string[];
   loadingEmails?: boolean;
   emailError?: string | null;

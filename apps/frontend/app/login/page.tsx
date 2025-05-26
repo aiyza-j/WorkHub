@@ -112,9 +112,11 @@ const LoginPage = () => {
 
         router.push('/dashboard');
     }
-    } catch (error: any) {
-      console.error('Sign-up error:', error);
-      showError(error.message || 'Something went wrong.');
+    } catch (error: unknown) {
+      if(error instanceof Error){
+        console.error('Sign-up error:', error);
+        showError(error.message || 'Something went wrong.');
+      }
     }
   };
 

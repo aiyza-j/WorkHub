@@ -11,6 +11,7 @@ import {
   Chip,
   Divider,
   SelectChangeEvent,
+  Theme,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -25,7 +26,7 @@ interface MobileTaskViewProps {
   error: string | null;
   editingTaskId: string | null;
   selectedTask: Task | null;
-  theme: any;
+  theme: Theme;
   userEmails: string[];
   loadingEmails?: boolean;
   emailError?: string | null;
@@ -35,7 +36,7 @@ interface MobileTaskViewProps {
   handleOpenDeleteModal: (task: Task) => void;
   handleStatusChange: (event: SelectChangeEvent) => void;
   handleTaskChange: (field: string, value: string) => void;
-  getStatusColor: (status: string) => any;
+  getStatusColor: (status: string) => void;
   setSelectedTask: (task: Task) => void;
 }
 

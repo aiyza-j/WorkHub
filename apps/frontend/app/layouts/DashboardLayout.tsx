@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { Box, useTheme, useMediaQuery, CssBaseline } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSession } from '@/app/hooks/useSession';
-import { useThemeContext } from '../contexts/ThemeContext';
 import dynamic from 'next/dynamic';
 const Header = dynamic(() => import('../components/Dashboard/Header'), {
   ssr: false,
@@ -49,7 +48,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     if (userRole) {
       setRole(userRole);
     }
-  }, []);
+  }, [role]);
 
   return (
     <Box

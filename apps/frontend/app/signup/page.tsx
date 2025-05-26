@@ -141,9 +141,12 @@ const SignUpPage = () => {
       } else {
         router.push('/login');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      if(error instanceof Error) {
       console.error('Sign-up error:', error);
       showError(error.message || 'Something went wrong.');
+      }
+
     }
   };
 
