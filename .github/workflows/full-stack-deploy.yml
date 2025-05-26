@@ -49,16 +49,16 @@ jobs:
           EOF
 
           # Pull latest images
-          docker-compose pull
+          docker compose pull
 
           # Start services
-          docker-compose up -d
+          docker compose up -d
 
           # Wait for services to be ready
           sleep 30
 
           # Health check
-          docker-compose ps
+          docker compose ps
 
   integration-tests:
     needs: deploy
