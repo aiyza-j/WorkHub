@@ -1,4 +1,5 @@
 import { alpha, Theme } from '@mui/material/styles';
+import { PaletteColor } from '@mui/material/styles';
 
 export const modalStyle = {
   position: 'absolute' as const,
@@ -19,7 +20,7 @@ export const tableHeaderStyle = {
 };
 
 export const statusBadgeStyle = (theme: Theme, status: string) => {
-  const colorMap: Record<string, any> = {
+  const colorMap: Record<string, PaletteColor> = {
     completed: theme.palette.success,
     'in-progress': theme.palette.warning,
     open: theme.palette.info,

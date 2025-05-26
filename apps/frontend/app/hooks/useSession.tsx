@@ -42,7 +42,7 @@ export const useSession = (): UseSessionReturn => {
       }
     }
     setLoading(false);
-  },[]);
+  },[router]);
 
   return { session, loading };
 };
