@@ -20,7 +20,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
-import { motion } from 'framer-motion';
 import { Task } from '../../types/Task';
 import { tableHeaderStyle, statusBadgeStyle, actionButtonStyle } from './styles';
 
@@ -48,7 +47,6 @@ interface TaskTableViewProps {
 const TaskTableView: React.FC<TaskTableViewProps> = ({
   tasks,
   loading,
-  error,
   editingTaskId,
   selectedTask,
   theme,
@@ -62,7 +60,6 @@ const TaskTableView: React.FC<TaskTableViewProps> = ({
   handleOpenDeleteModal,
   handleStatusChange,
   handleTaskChange,
-  getStatusColor,
 }) => {
   return (
     <TableContainer component={Paper} sx={{ width: '100%', overflowX: 'auto', borderRadius: 2, boxShadow: 3 }}>
@@ -198,14 +195,14 @@ const TaskTableView: React.FC<TaskTableViewProps> = ({
                         color="primary"
                         onClick={handleSave}
                         size="small"
-                        sx={actionButtonStyle(theme, 'success')}
+                        sx={actionButtonStyle()}
                       >
                         <CheckIcon fontSize="small" />
                       </IconButton>
                       <IconButton
                         onClick={handleCancelEdit}
                         size="small"
-                        sx={actionButtonStyle(theme, 'default')}
+                        sx={actionButtonStyle()}
                       >
                         <CloseIcon fontSize="small" />
                       </IconButton>
@@ -217,7 +214,7 @@ const TaskTableView: React.FC<TaskTableViewProps> = ({
                           color="primary"
                           onClick={() => handleEdit(task)}
                           size="small"
-                          sx={actionButtonStyle(theme, 'primary')}
+                          sx={actionButtonStyle()}
                         >
                           <EditIcon fontSize="small" />
                         </IconButton>
@@ -227,7 +224,7 @@ const TaskTableView: React.FC<TaskTableViewProps> = ({
                           color="error"
                           onClick={() => handleOpenDeleteModal(task)}
                           size="small"
-                          sx={actionButtonStyle(theme, 'error')}
+                          sx={actionButtonStyle()}
                         >
                           <DeleteIcon fontSize="small" />
                         </IconButton>

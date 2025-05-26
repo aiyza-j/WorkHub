@@ -42,7 +42,6 @@ interface MobileTaskViewProps {
 const MobileTaskView: React.FC<MobileTaskViewProps> = ({
   tasks,
   loading,
-  error,
   editingTaskId,
   selectedTask,
   theme,
@@ -55,7 +54,6 @@ const MobileTaskView: React.FC<MobileTaskViewProps> = ({
   handleOpenDeleteModal,
   handleStatusChange,
   handleTaskChange,
-  getStatusColor,
 }) => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -178,14 +176,14 @@ const MobileTaskView: React.FC<MobileTaskViewProps> = ({
                     color="primary"
                     onClick={handleSave}
                     size="small"
-                    sx={actionButtonStyle(theme, 'success')}
+                    sx={actionButtonStyle()}
                   >
                     <CheckIcon fontSize="small" />
                   </IconButton>
                   <IconButton
                     onClick={handleCancelEdit}
                     size="small"
-                    sx={actionButtonStyle(theme, 'default')}
+                    sx={actionButtonStyle()}
                   >
                     <CloseIcon fontSize="small" />
                   </IconButton>
@@ -197,7 +195,7 @@ const MobileTaskView: React.FC<MobileTaskViewProps> = ({
                       color="primary"
                       onClick={() => handleEdit(task)}
                       size="small"
-                      sx={actionButtonStyle(theme, 'primary')}
+                      sx={actionButtonStyle()}
                     >
                       <EditIcon fontSize="small" />
                     </IconButton>
@@ -207,7 +205,7 @@ const MobileTaskView: React.FC<MobileTaskViewProps> = ({
                       color="error"
                       onClick={() => handleOpenDeleteModal(task)}
                       size="small"
-                      sx={actionButtonStyle(theme, 'error')}
+                      sx={actionButtonStyle()}
                     >
                       <DeleteIcon fontSize="small" />
                     </IconButton>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Table,
   TableBody,
@@ -25,8 +26,7 @@ interface TableViewProps {
   projects: Project[];
   editingProjectId: string | null;
   selectedProject: Project | null;
-  router: any;
-  theme: any;
+  router: ReturnType<typeof useRouter>;
   handleEdit: (project: Project) => void;
   handleSave: () => void;
   handleCancelEdit: () => void;
@@ -39,7 +39,6 @@ const TableView: React.FC<TableViewProps> = ({
   editingProjectId,
   selectedProject,
   router,
-  theme,
   handleEdit,
   handleSave,
   handleCancelEdit,

@@ -15,9 +15,8 @@
   } from '@mui/material';
   import SearchIcon from '@mui/icons-material/Search';
   import AddIcon from '@mui/icons-material/Add';
-  import { motion } from 'framer-motion';
-  import { useRouter, useSearchParams } from 'next/navigation';
-  import { Task, ServerResponse, STATUS_OPTIONS, ITEMS_PER_PAGE } from '../../types/Task';
+  import { useSearchParams } from 'next/navigation';
+  import { Task, STATUS_OPTIONS, ITEMS_PER_PAGE } from '../../types/Task';
   import { fetchTasks, createTask, deleteTask, updateTask } from '../../services/taskServices';
   import { fetchUserEmails } from '../../services/userService';
 const CreateModal = dynamic(() => import('./createModal'));

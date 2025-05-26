@@ -7,7 +7,6 @@ import {
   DialogContentText,
   DialogTitle,
   Box,
-  useTheme,
   Fade,
   Backdrop
 } from '@mui/material';
@@ -27,7 +26,7 @@ const DeleteUserModal = ({
   selectedUser,
   onDelete
 }: DeleteUserModalProps) => {
-  const theme = useTheme();
+
 
   return (
     <Dialog

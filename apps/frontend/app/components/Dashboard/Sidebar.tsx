@@ -14,7 +14,6 @@ import {
   useTheme as useMuiTheme,
   useMediaQuery
 } from '@mui/material';
-import DashboardIcon from '@mui/icons-material/Dashboard';
 import PersonIcon from '@mui/icons-material/Person';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import WorkIcon from '@mui/icons-material/Work';
@@ -22,7 +21,6 @@ import Link from 'next/link';
 import { useTheme } from '@mui/material/styles';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
-import { useSession } from '@/app/hooks/useSession';
 
 interface SidebarProps {
   open: boolean;
@@ -44,8 +42,6 @@ const Sidebar: React.FC<SidebarProps> = ({ open, role }) => {
           { label: 'My Projects', icon: <WorkIcon />, path: '/project' },
           { label: 'My Tasks', icon: <AssignmentIcon />, path: '/task' },
         ];
-
-  const sidebarWidth = open ? { xs: 220, sm: 240 } : { xs: 65, sm: 70 };
 
   const sidebarVariants = {
     open: { width: isMobile ? 220 : 240, transition: { duration: 0.3, ease: "easeInOut" } },

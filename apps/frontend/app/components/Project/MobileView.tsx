@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Card,
   Typography,
@@ -17,7 +18,7 @@ interface MobileViewProps {
   projects: Project[];
   editingProjectId: string | null;
   selectedProject: Project | null;
-  router: any;
+  router: ReturnType<typeof useRouter>;
   handleEdit: (project: Project) => void;
   handleSave: () => void;
   handleCancelEdit: () => void;

@@ -109,7 +109,7 @@ const LoginPage = () => {
           showError(data.message || 'Invalid credentials');
         }
       }  else {
-        const DashboardComponent = (await import('../../app/dashboard/DashboardRedirect')).default;
+
         router.push('/dashboard');
     }
     } catch (error: any) {
@@ -272,7 +272,7 @@ const LoginPage = () => {
 
               <motion.div custom={3} variants={inputVariants} initial="hidden" animate="visible">
                 <Typography textAlign="center" mt={2}>
-                  Don't have an account?{' '}
+                  Dont have an account?{' '}
                   <Link
                     onClick={() => router.push('/signup')}
                     sx={{

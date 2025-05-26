@@ -20,11 +20,10 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
-  const { mode, toggleTheme } = useThemeContext();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const { session, loading } = useSession();
+  const { session } = useSession();
 
 
   useEffect(() => {
@@ -46,6 +45,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   useEffect(() => {
     const userRole = localStorage.getItem('userRole') as 'admin' | 'user';
+    console.log(role)
     if (userRole) {
       setRole(userRole);
     }

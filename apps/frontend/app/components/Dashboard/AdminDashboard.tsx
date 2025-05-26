@@ -61,7 +61,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     loadUsers();
-  }, [searchTerm, page]);
+  }, [searchTerm, page, loadUsers]);
 
   useEffect(() => {
     setPage(1);

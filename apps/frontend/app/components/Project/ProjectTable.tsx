@@ -18,7 +18,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Project, ServerResponse } from '../../types/Project';
+import { Project } from '../../types/Project';
 import { fetchProjects, createProject, updateProject, deleteProject } from '../../services/projectServices';
 const CreateModal = dynamic(() => import('../CreateModal'));
 const DeleteModal = dynamic(() => import('./DeleteModal'));
@@ -50,18 +50,23 @@ export default function ProjectTable() {
       const data = await fetchProjects(page, ITEMS_PER_PAGE, searchTerm);
       setProjects(data.projects);
       setTotalCount(data.totalCount);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unknown error occurred');
+      }
       setProjects([]);
       setTotalCount(0);
-    } finally {
-      setLoading(false);
     }
-  };
+    finally {
+          setLoading(false);
+        }
+      };
 
   useEffect(() => {
     loadProjects();
-  }, [searchTerm, page]);
+  }, [searchTerm, page, loadProjects]);
 
   useEffect(() => {
     setPage(1);
@@ -259,7 +264,6 @@ export default function ProjectTable() {
               editingProjectId={editingProjectId}
               selectedProject={selectedProject}
               router={router}
-              theme={theme}
               handleEdit={handleEdit}
               handleSave={handleSave}
               handleCancelEdit={handleCancelEdit}

@@ -39,7 +39,7 @@ export const statusBadgeStyle = (theme: any, status: string) => {
   };
 };
 
-export const actionButtonStyle = (theme: any, color: 'primary' | 'error' | 'success' | 'default' = 'primary') => {
+export const actionButtonStyle = () => {
   return {
     backgroundColor: alpha("#3c096c", 0.1),
     '&:hover': {

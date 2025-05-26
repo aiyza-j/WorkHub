@@ -4,7 +4,7 @@ import React, { ComponentType, useEffect } from 'react';
 import { useSession } from '../hooks/useSession';
 import { useRouter } from 'next/navigation';
 
-export function withAuth<T extends {}>(WrappedComponent: ComponentType<T>, requiredRole?: string) {
+export function withAuth<T extends object>(WrappedComponent: ComponentType<T>, requiredRole?: string) {
   const ComponentWithAuth = (props: T) => {
     const { session, loading } = useSession();
     const router = useRouter();

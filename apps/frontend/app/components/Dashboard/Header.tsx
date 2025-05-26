@@ -24,7 +24,7 @@ interface HeaderProps {
   sidebarOpen: boolean;
 }
 
-const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
+const Header = ({ toggleSidebar }: HeaderProps) => {
   const theme = useTheme();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm'));

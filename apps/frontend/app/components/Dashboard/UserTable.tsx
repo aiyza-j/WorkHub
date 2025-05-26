@@ -14,8 +14,7 @@ import {
   Chip,
   alpha,
   useTheme,
-  IconButton,
-  ClickAwayListener
+  IconButton
 } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import EditIcon from '@mui/icons-material/Edit';
@@ -49,7 +48,6 @@ const UserTable = ({
 }: UserTableProps) => {
   const theme = useTheme();
   const styles = getStyles(theme);
-  const MotionTableRow = motion(TableRow);
   const [editValues, setEditValues] = React.useState<{ full_name: string; email: string }>({
     full_name: '',
     email: ''
