@@ -20,6 +20,33 @@ jobs:
       contents: read
       packages: write
 
+  cleanup-artifacts:
+    needs: [build-frontend, build-backend]
+    runs-on: ubuntu-latest
+    if: always() 
+    permissions:
+      actions: write
+
+    steps:
+      - name: Delete artifacts from frontend build
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId,
+            });
+
+            for (const artifact of artifacts.data.artifacts) {
+              console.log(`Deleting artifact: ${artifact.name}`);
+              await github.rest.actions.deleteArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: artifact.id,
+              });
+            }
+
   deploy:
     needs: [build-frontend, build-backend]
     runs-on: ubuntu-latest
