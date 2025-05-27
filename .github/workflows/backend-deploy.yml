@@ -64,7 +64,6 @@ jobs:
           file: ./apps/backend/coverage.xml
           flags: backend
           token: ${{ secrets.CODECOV_TOKEN }}
-          slug: aiyza-j/WorkHub
 
       - name: Upload coverage report as artifact
         uses: actions/upload-artifact@v4
